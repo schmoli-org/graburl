@@ -15,7 +15,7 @@ extensionApi.action.onClicked.addListener(() => {
 });
 
 extensionApi.commands.onCommand.addListener((command) => {
-  if (command === "copy-current-tab-url") {
+  if (command === "_execute_action") {
     copyCurrentTabUrl().catch(console.error);
   }
 });

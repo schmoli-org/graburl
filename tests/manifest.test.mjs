@@ -5,11 +5,15 @@ import { test } from "node:test";
 
 const manifest = JSON.parse(fs.readFileSync("web-extension/manifest.json", "utf8"));
 
-test("copy command defaults to Command+Shift+C on macOS", () => {
+test("copy action defaults to Command+Shift+C on macOS", () => {
   assert.equal(
-    manifest.commands["copy-current-tab-url"].suggested_key.mac,
+    manifest.commands._execute_action.suggested_key.mac,
     "Command+Shift+C"
   );
+});
+
+test("extension only exposes the built-in action command", () => {
+  assert.deepEqual(Object.keys(manifest.commands), ["_execute_action"]);
 });
 
 test("extension declares toolbar and listing icons", () => {

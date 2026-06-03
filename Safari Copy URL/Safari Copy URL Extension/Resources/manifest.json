@@ -28,12 +28,12 @@
     }
   },
   "commands": {
-    "copy-current-tab-url": {
+    "_execute_action": {
       "suggested_key": {
         "default": "Ctrl+Shift+C",
         "mac": "Command+Shift+C"
       },
-      "description": "Copy the current tab URL"
+      "description": "Copy URL"
     }
   }
 }
