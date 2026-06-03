@@ -20,59 +20,44 @@ function loadExtensionModule() {
   return loadExtensionSandbox().CopyUrlExtension;
 }
 
-async function getInjectedToastScript() {
-  const sandbox = loadExtensionSandbox();
-  const { copyActiveTabUrl } = sandbox.CopyUrlExtension;
-  const scripts = [];
-
-  await copyActiveTabUrl({
-    tabsApi: {
-      query: async () => [
-        {
-          id: 42,
-          url: "https://example.com/"
-        }
-      ]
-    },
-    scriptingApi: {
-      executeScript: async (details) => scripts.push(details)
-    }
-  });
-
-  return { sandbox, script: scripts[0] };
-}
-
-function installInjectedDom(sandbox) {
+function installClipboardDom(sandbox) {
   const appended = [];
-  const frames = [];
-  const timers = [];
-  const writes = [];
+  const removed = [];
+  const selections = [];
+  const execCommands = [];
+  const created = [];
 
-  sandbox.navigator = {
-    clipboard: {
-      writeText: async (text) => writes.push(text)
+  sandbox.document = {
+    body: {
+      appendChild: (element) => {
+        appended.push(element);
+      }
+    },
+    createElement: (tagName) => {
+      const element = {
+        tagName,
+        value: "",
+        style: {},
+        setAttribute() {},
+        focus() {},
+        select() {
+          selections.push(this.value);
+        },
+        remove() {
+          removed.push(this.value);
+        }
+      };
+
+      created.push(element);
+      return element;
+    },
+    execCommand: (command) => {
+      execCommands.push(command);
+      return true;
     }
   };
-  sandbox.document = {
-    documentElement: {
-      appendChild: (element) => appended.push(element)
-    },
-    getElementById: () => null,
-    createElement: (tagName) => ({
-      tagName,
-      id: "",
-      textContent: "",
-      style: {},
-      removeCalls: 0,
-      remove() {
-        this.removeCalls += 1;
-      }
-    })
-  };
-  sandbox.requestAnimationFrame = (callback) => frames.push(callback);
-  sandbox.setTimeout = (callback, delay) => timers.push({ callback, delay });
 
-  return { appended, frames, timers, writes };
+  return { appended, removed, selections, execCommands, created };
 }
 
 test("getActiveTabUrl returns the active tab URL exactly", async () => {
@@ -88,87 +73,58 @@ test("getActiveTabUrl returns the active tab URL exactly", async () => {
   assert.equal(await getActiveTabUrl(tabsApi), "https://google.com");
 });
 
-test("copyActiveTabUrl injects a script that writes the active tab URL exactly and shows a toast", async () => {
-  const { copyActiveTabUrl } = loadExtensionModule();
-  const scripts = [];
+test("copyTextToClipboard uses the DOM clipboard flow when available", async () => {
+  const { copyTextToClipboard } = loadExtensionModule();
+  const sandbox = loadExtensionSandbox();
+  const { appended, removed, selections, execCommands, created } = installClipboardDom(sandbox);
 
-  const result = await copyActiveTabUrl({
-    tabsApi: {
-      query: async () => [
-        {
-          id: 42,
-          url: "https://example.com/search?q=safari%20extension"
-        }
-      ]
-    },
-    scriptingApi: {
-      executeScript: async (details) => scripts.push(details)
-    }
-  });
+  await copyTextToClipboard("https://example.com/", { document: sandbox.document });
 
-  assert.equal(result, "https://example.com/search?q=safari%20extension");
-  assert.equal(scripts.length, 1);
-  assert.equal(scripts[0].target.tabId, 42);
-  assert.equal(scripts[0].args.length, 1);
-  assert.equal(scripts[0].args[0], "https://example.com/search?q=safari%20extension");
-  assert.equal(typeof scripts[0].func, "function");
-});
-
-test("copyActiveTabUrl injected toast appears top-center below Safari chrome", async () => {
-  const { sandbox, script } = await getInjectedToastScript();
-  const { appended } = installInjectedDom(sandbox);
-
-  await script.func(script.args[0]);
-
+  assert.equal(created.length, 1);
   assert.equal(appended.length, 1);
-  assert.equal(appended[0].style.position, "fixed");
-  assert.equal(appended[0].style.top, "12px");
-  assert.equal(appended[0].style.left, "50%");
-  assert.match(appended[0].style.transform, /translate\(-50%,/);
-  assert.equal(appended[0].style.right, undefined);
-  assert.equal(appended[0].style.bottom, undefined);
+  assert.equal(appended[0].tagName, "textarea");
+  assert.equal(appended[0].value, "https://example.com/");
+  assert.deepEqual(selections, ["https://example.com/"]);
+  assert.deepEqual(execCommands, ["copy"]);
+  assert.deepEqual(removed, ["https://example.com/"]);
 });
 
-test("copyActiveTabUrl injected toast slides down, stays steady, then slides up", async () => {
-  const { sandbox, script } = await getInjectedToastScript();
-  const { appended, frames, timers } = installInjectedDom(sandbox);
-
-  await script.func(script.args[0]);
-
-  assert.equal(appended.length, 1);
-  const toast = appended[0];
-  assert.equal(toast.style.opacity, "0");
-  assert.equal(toast.style.transform, "translate(-50%, -12px) scale(0.96)");
-  assert.match(toast.style.transition, /transform 260ms/);
-
-  assert.equal(frames.length, 1);
-  frames.shift()();
-  assert.equal(toast.style.opacity, "1");
-  assert.equal(toast.style.transform, "translate(-50%, 0) scale(1)");
-
-  timers.find((timer) => timer.delay === 1320).callback();
-  assert.equal(toast.style.opacity, "0");
-  assert.equal(toast.style.transform, "translate(-50%, -12px) scale(0.98)");
-
-  timers.find((timer) => timer.delay === 1600).callback();
-  assert.equal(toast.removeCalls, 1);
-});
-
-test("copyActiveTabUrl falls back to the background clipboard when page injection is unavailable", async () => {
-  const { copyActiveTabUrl } = loadExtensionModule();
+test("copyTextToClipboard falls back to the clipboard API when DOM copy is unavailable", async () => {
+  const { copyTextToClipboard } = loadExtensionModule();
   const writes = [];
 
-  const result = await copyActiveTabUrl({
-    tabsApi: {
-      query: async () => [{ url: "https://fallback.example/" }]
-    },
+  await copyTextToClipboard("https://fallback.example/", {
     clipboard: {
       writeText: async (text) => writes.push(text)
     }
   });
 
-  assert.equal(result, "https://fallback.example/");
   assert.deepEqual(writes, ["https://fallback.example/"]);
+});
+
+test("copyActiveTabUrl copies the active tab URL exactly", async () => {
+  const { copyActiveTabUrl } = loadExtensionModule();
+  const sandbox = loadExtensionSandbox();
+  const { appended, removed, selections, execCommands } = installClipboardDom(sandbox);
+
+  const result = await copyActiveTabUrl({
+    tabsApi: {
+      query: async () => [
+        {
+          url: "https://example.com/search?q=safari%20extension"
+        }
+      ]
+    },
+    document: sandbox.document
+  });
+
+  assert.equal(result, "https://example.com/search?q=safari%20extension");
+  assert.deepEqual(appended.map((element) => element.value), [
+    "https://example.com/search?q=safari%20extension"
+  ]);
+  assert.deepEqual(selections, ["https://example.com/search?q=safari%20extension"]);
+  assert.deepEqual(execCommands, ["copy"]);
+  assert.deepEqual(removed, ["https://example.com/search?q=safari%20extension"]);
 });
 
 test("copyActiveTabUrl rejects when the active tab has no copyable URL", async () => {

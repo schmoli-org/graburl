@@ -12,7 +12,10 @@ test("copy action defaults to Command+Shift+C on macOS", () => {
   );
 });
 
-test("extension only exposes the built-in action command", () => {
+test("extension only requests activeTab and opens a popup", () => {
+  assert.deepEqual(manifest.permissions, ["activeTab"]);
+  assert.equal(manifest.action.default_popup, "popup.html");
+  assert.equal(manifest.background, undefined);
   assert.deepEqual(Object.keys(manifest.commands), ["_execute_action"]);
 });
 

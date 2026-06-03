@@ -10,81 +10,60 @@
     return url;
   }
 
-  async function copyActiveTabUrl({ tabsApi, clipboard, scriptingApi }) {
-    const [tab] = await tabsApi.query({ active: true, currentWindow: true });
-    const url = tab?.url;
+  async function copyTextToClipboard(text, { document, clipboard } = {}) {
+    const canUseDomClipboard =
+      document &&
+      document.body &&
+      typeof document.createElement === "function" &&
+      typeof document.execCommand === "function";
 
-    if (!url) {
-      throw new Error("No active tab URL");
-    }
+    if (canUseDomClipboard) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.setAttribute("readonly", "");
 
-    if (scriptingApi?.executeScript && tab.id != null) {
-      await scriptingApi.executeScript({
-        target: { tabId: tab.id },
-        func: copyUrlAndShowToast,
-        args: [url]
+      Object.assign(textarea.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        width: "1px",
+        height: "1px",
+        padding: "0",
+        border: "0",
+        opacity: "0",
+        pointerEvents: "none"
       });
-    } else if (clipboard?.writeText) {
-      await clipboard.writeText(url);
-    } else {
-      throw new Error("Clipboard API unavailable");
+
+      document.body.appendChild(textarea);
+      textarea.focus?.();
+      textarea.select?.();
+
+      try {
+        if (document.execCommand("copy")) {
+          return;
+        }
+      } finally {
+        textarea.remove?.();
+      }
     }
 
-    return url;
+    if (clipboard?.writeText) {
+      await clipboard.writeText(text);
+      return;
+    }
+
+    throw new Error("Clipboard API unavailable");
   }
 
-  async function copyUrlAndShowToast(url) {
-    await navigator.clipboard.writeText(url);
-
-    const existingToast = document.getElementById("copy-url-extension-toast");
-    if (existingToast) {
-      existingToast.remove();
-    }
-
-    const toast = document.createElement("div");
-    toast.id = "copy-url-extension-toast";
-    toast.textContent = "URL copied";
-
-    Object.assign(toast.style, {
-      position: "fixed",
-      zIndex: "2147483647",
-      top: "12px",
-      left: "50%",
-      opacity: "0",
-      transform: "translate(-50%, -12px) scale(0.96)",
-      transformOrigin: "50% 0",
-      transition: "transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease-out",
-      padding: "10px 12px",
-      borderRadius: "8px",
-      background: "rgba(24, 24, 27, 0.94)",
-      color: "#ffffff",
-      font: "13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.25)",
-      pointerEvents: "none"
-    });
-
-    document.documentElement.appendChild(toast);
-
-    const showToast = () => {
-      toast.style.opacity = "1";
-      toast.style.transform = "translate(-50%, 0) scale(1)";
-    };
-
-    if (typeof requestAnimationFrame === "function") {
-      requestAnimationFrame(showToast);
-    } else {
-      setTimeout(showToast, 0);
-    }
-
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      toast.style.transform = "translate(-50%, -12px) scale(0.98)";
-    }, 1320);
-    setTimeout(() => toast.remove(), 1600);
+  async function copyActiveTabUrl({ tabsApi, document, clipboard }) {
+    const url = await getActiveTabUrl(tabsApi);
+    await copyTextToClipboard(url, { document, clipboard });
+    return url;
   }
 
   global.CopyUrlExtension = {
     copyActiveTabUrl,
+    copyTextToClipboard,
     getActiveTabUrl
   };
 })(globalThis);
