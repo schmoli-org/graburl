@@ -1,0 +1,1637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Story Time · Listening Timeline Playground</title>
+<style>
+  :root {
+    --bg: #0e1014;
+    --panel: #14171d;
+    --panel-2: #1a1e26;
+    --line: #2a2f3a;
+    --text: #e7e9ee;
+    --muted: #8a91a0;
+    --accent: #8ab4ff;
+    --accent-2: #c8a2ff;
+    --warn: #ffb86b;
+    --good: #7ee2b8;
+    --sleep: #5b6cff;
+    --device-bg: #0a0c10;
+    --device-panel: #131720;
+    --device-panel-2: #1b2030;
+    --device-text: #ecf0fa;
+    --device-muted: #7f879a;
+    --device-line: #2a3142;
+    --device-accent: #9ec1ff;
+  }
+  body.light {
+    --bg: #f4f5f8;
+    --panel: #ffffff;
+    --panel-2: #eef0f5;
+    --line: #d8dce4;
+    --text: #161922;
+    --muted: #6d7488;
+    --accent: #2f64d4;
+    --accent-2: #7a4ad6;
+    --warn: #b46a00;
+    --good: #1e8b66;
+    --sleep: #4a5dff;
+  }
+  body.light .device {
+    --device-bg: #f7f7fb;
+    --device-panel: #ffffff;
+    --device-panel-2: #f0f1f6;
+    --device-text: #11131a;
+    --device-muted: #6c7384;
+    --device-line: #d9dde6;
+    --device-accent: #2f64d4;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 340px 1fr 380px;
+    height: 100vh;
+    min-height: 700px;
+    transition: grid-template-columns 260ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  .app.controls-min                    { grid-template-columns: 40px 1fr 380px; }
+  .app.narrative-min                   { grid-template-columns: 340px 1fr 40px; }
+  .app.controls-min.narrative-min      { grid-template-columns: 40px 1fr 40px;  }
+
+  /* Collapse toggle — small chevron in the corner of each side panel. */
+  .panel-toggle {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    font: 600 14px/1 -apple-system, BlinkMacSystemFont, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color 120ms ease, border-color 120ms ease, transform 240ms ease;
+  }
+  .panel-toggle:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .controls-head, .narrative-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .narrative-head { justify-content: space-between; flex-direction: row-reverse; }
+
+  /* Hide everything except the toggle when minimized. */
+  .app.controls-min .controls { padding: 18px 6px; overflow: hidden; }
+  .app.controls-min .controls > *:not(.controls-head),
+  .app.controls-min .controls-head > *:not(.panel-toggle) { display: none; }
+  .app.controls-min .controls-head { margin: 0; }
+  .app.controls-min [data-toggle-controls] { transform: rotate(180deg); }
+
+  .app.narrative-min .narrative { padding: 18px 6px; overflow: hidden; }
+  .app.narrative-min .narrative > *:not(.narrative-head),
+  .app.narrative-min .narrative-head > *:not(.panel-toggle) { display: none; }
+  .app.narrative-min .narrative-head { margin: 0; }
+  .app.narrative-min [data-toggle-narrative] { transform: rotate(180deg); }
+
+  /* ---------- Controls ---------- */
+  .controls {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 18px 18px 28px;
+  }
+  .controls h1 {
+    font: 600 14px/1.2 inherit;
+    letter-spacing: 0.02em;
+    margin: 0 0 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .controls .subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  details.group {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    background: var(--panel-2);
+  }
+  details.group[open] { padding-bottom: 14px; }
+  details.group > summary {
+    cursor: pointer;
+    list-style: none;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    color: var(--text);
+  }
+  details.group > summary::-webkit-details-marker { display: none; }
+  details.group > summary::after {
+    content: '+';
+    color: var(--muted);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1;
+  }
+  details.group[open] > summary::after { content: '−'; }
+  .row { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+  .row > label { font-size: 12px; color: var(--muted); }
+  .row .value { font-size: 11px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .row input[type=range] { width: 100%; accent-color: var(--accent); }
+
+  .seg {
+    display: inline-flex;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 2px;
+    width: 100%;
+  }
+  .seg button {
+    flex: 1;
+    background: transparent;
+    color: var(--muted);
+    border: 0;
+    padding: 6px 4px;
+    font: inherit;
+    font-size: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 80ms ease, color 80ms ease;
+  }
+  .seg button.on {
+    background: var(--panel-2);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .toggle input { display: none; }
+  .toggle .ind {
+    width: 30px; height: 18px; background: var(--line); border-radius: 999px; position: relative; transition: background 120ms ease;
+  }
+  .toggle .ind::after {
+    content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; transition: transform 120ms ease;
+  }
+  .toggle input:checked + .ind { background: var(--accent); }
+  .toggle input:checked + .ind::after { transform: translateX(12px); }
+
+
+  /* ---------- Narrative panel (right side) ---------- */
+  .narrative {
+    background: var(--panel);
+    border-left: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 22px 20px 28px;
+    color: var(--text);
+  }
+  .narrative h2 {
+    font: 600 13px/1.2 inherit;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 4px;
+  }
+  .narrative .narr-subtitle {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 18px;
+    line-height: 1.4;
+  }
+  .narr-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+  }
+  .narr-list::before {
+    content: '';
+    position: absolute;
+    left: 53px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: var(--line);
+  }
+  .narr-list li {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    gap: 14px;
+    padding: 8px 0;
+    align-items: start;
+    position: relative;
+  }
+  .narr-list li::after {
+    content: '';
+    position: absolute;
+    left: 50px;
+    top: 14px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--muted);
+    box-shadow: 0 0 0 3px var(--panel);
+  }
+  .narr-list li.kind-resume::after { background: #4ade80; }
+  .narr-list li.kind-pause::after,
+  .narr-list li.kind-sleep-fire::after { background: var(--sleep); }
+  .narr-list li.kind-chapter::after { background: var(--accent-2); }
+  .narr-list li.kind-rewind::after { background: var(--muted); }
+  .narr-list li.kind-timer-set::after { background: var(--sleep); box-shadow: 0 0 0 3px var(--panel), inset 0 0 0 2px var(--panel); }
+  .narr-time {
+    font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    color: var(--muted);
+    text-align: right;
+    padding-top: 2px;
+  }
+  .narr-action {
+    font: 600 13px/1.3 inherit;
+    color: var(--text);
+  }
+  .narr-detail {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+  .narr-divider {
+    grid-column: 1 / -1;
+    border: 0;
+    border-top: 1px dashed var(--line);
+    margin: 10px 0 10px 58px;
+  }
+  .narr-divider-label {
+    grid-column: 1 / -1;
+    padding-left: 72px;
+    margin: 8px 0 4px;
+    font: italic 11px/1.2 inherit;
+    color: var(--muted);
+    opacity: 0.7;
+  }
+
+  /* "Book progress" — future, stubbed */
+  .future-stub {
+    padding: 20px;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    margin: 20px;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .future-stub strong {
+    color: var(--text);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* ---------- Preview ---------- */
+  .preview {
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    background:
+      radial-gradient(1200px 600px at 70% 10%, rgba(138,180,255,0.08), transparent 60%),
+      radial-gradient(800px 500px at 10% 90%, rgba(200,162,255,0.06), transparent 60%),
+      var(--bg);
+  }
+  .stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 28px;
+  }
+
+  /* ---------- iPhone frame ---------- */
+  .device {
+    width: 390px;
+    height: 780px;
+    background: var(--device-bg);
+    color: var(--device-text);
+    border-radius: 44px;
+    box-shadow:
+      0 0 0 8px #111,
+      0 20px 60px rgba(0,0,0,0.5),
+      0 6px 24px rgba(0,0,0,0.35);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
+  }
+  .device .notch {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 110px; height: 30px; border-radius: 18px; background: #000;
+    z-index: 10;
+  }
+  .status-bar {
+    height: 46px; display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 24px 6px; font-weight: 600; font-size: 13px; color: var(--device-text);
+    flex-shrink: 0;
+  }
+  .app-header {
+    padding: 6px 20px 10px;
+    display: flex; flex-direction: column; gap: 10px;
+    flex-shrink: 0;
+  }
+  .app-title {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .app-title h2 { margin: 0; font-size: 22px; font-weight: 700; }
+  .app-title .book {
+    font-size: 12px; color: var(--device-muted);
+    max-width: 180px; text-align: right; line-height: 1.25;
+  }
+  .view-toggle {
+    display: flex; background: var(--device-panel); border-radius: 10px; padding: 3px;
+    border: 1px solid var(--device-line);
+  }
+  .view-toggle button {
+    flex: 1; background: transparent; border: 0; color: var(--device-muted);
+    padding: 7px 10px; font: 600 12px inherit; border-radius: 8px; cursor: pointer;
+  }
+  .view-toggle button.on {
+    background: var(--device-panel-2); color: var(--device-text);
+  }
+
+  .scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 6px 0 30px;
+    scrollbar-width: thin;
+  }
+  .scroll::-webkit-scrollbar { width: 4px; }
+  .scroll::-webkit-scrollbar-thumb { background: var(--device-line); border-radius: 4px; }
+
+  /* ---------- Timeline ---------- */
+  .timeline { position: relative; padding: 4px 0 40px; }
+  /* Single continuous line passing through icon centers. Lane center sits at:
+     padding-left(16) + col1(76) + gap(8) + half-of-lane-col(18) = 118px */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 118px;
+    top: 28px;
+    bottom: 28px;
+    width: 2px;
+    background: var(--device-line);
+    border-radius: 2px;
+    z-index: 0;
+  }
+
+  .day-band {
+    position: relative;
+    padding: 20px 16px 4px 132px;
+    z-index: 1;
+    font-size: 11px;
+    color: var(--device-muted);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .day-band .day-label {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+  .day-band .day-sub {
+    opacity: 0.6;
+    font-weight: 500;
+  }
+  body.banding-on .day-band {
+    background: linear-gradient(90deg, rgba(255,255,255,0.025), transparent 70%);
+  }
+  body.light.banding-on .day-band {
+    background: linear-gradient(90deg, rgba(0,0,0,0.025), transparent 70%);
+  }
+
+  /* Generic row: [ time-pill | icon-lane | body | right ]
+     Lane column grows for stacked events but the FIRST icon always sits with
+     its center at left:118px, so the spine stays anchored. */
+  .row-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: 76px minmax(36px, max-content) 1fr auto;
+    align-items: center;
+    column-gap: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: background 80ms ease;
+    z-index: 2;
+  }
+  .row-entry:hover { background: rgba(255,255,255,0.025); }
+  body.light .row-entry:hover { background: rgba(0,0,0,0.025); }
+  .row-entry.no-click { cursor: default; }
+  .row-entry.no-click:hover { background: transparent; }
+
+  .time-pill {
+    justify-self: end;
+    background: rgba(255,255,255,0.07);
+    border-radius: 999px;
+    padding: 4px 9px;
+    font: 600 10.5px/1 -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--device-text);
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  body.light .time-pill { background: rgba(0,0,0,0.06); }
+
+  .lane {
+    height: 36px;
+    min-width: 36px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  /* Inline action-sequence in a row title (when multiple events burst together).
+     The lane still shows ONE icon (the first action); subsequent actions render
+     as small glyph + param inline in the title. */
+  .seq-step {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid var(--device-line);
+  }
+  .seq-glyph {
+    font-size: 13px;
+    opacity: 0.95;
+  }
+  .ico {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--device-line);
+    background: var(--device-bg);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--device-muted);
+    position: relative;
+    z-index: 2;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .ico.resume       { border-color: #4ade80; color: #4ade80; }
+  .ico.resume.latest{ background: rgba(74,222,128,0.14); }
+  .ico.pause        { color: var(--device-muted); }
+  .ico.sleep-start  { background: rgba(91,108,255,0.14); border-color: var(--sleep); color: var(--sleep); font-size: 11px; font-weight: 700; letter-spacing: -1px; }
+  .ico.sleep-end    { background: rgba(91,108,255,0.14); border-color: var(--sleep); color: var(--sleep); font-size: 11px; font-weight: 700; letter-spacing: -1px; }
+  /* sleep-set is the user's INTENT (forward-looking moon) — distinct from
+     sleep-end (the timer firing, "Zz"). Same color family, different glyph. */
+  .ico.sleep-set    { background: rgba(91,108,255,0.10); border-color: var(--sleep); color: var(--sleep); font-size: 14px; }
+  .ico.smart        { background: rgba(126,226,184,0.10); border-color: var(--good); color: var(--good); }
+  .ico.speed        { background: rgba(255,184,107,0.10); border-color: var(--warn); color: var(--warn); }
+  .ico.chapter      { background: rgba(200,162,255,0.10); border-color: var(--accent-2); color: var(--accent-2); }
+  .ico.rewind       { color: var(--device-muted); }
+  .ico.ff           { color: var(--device-muted); }
+  .ico.period       { background: var(--device-panel-2); border-color: var(--device-muted); color: var(--device-muted); font-size: 14px; }
+
+  /* CSS-drawn play / pause / stop glyphs */
+  .glyph-play {
+    width: 0; height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid currentColor;
+    margin-left: 2px;
+  }
+  .glyph-pause {
+    width: 7px; height: 9px;
+    box-sizing: content-box;
+    border-left: 2.5px solid currentColor;
+    border-right: 2.5px solid currentColor;
+  }
+  .glyph-stop {
+    width: 8px; height: 8px;
+    background: currentColor;
+    border-radius: 1.5px;
+  }
+
+  .entry-body { min-width: 0; }
+  .entry-title {
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 1.2;
+    color: var(--device-text);
+  }
+  .entry-title.muted { color: var(--device-muted); font-weight: 500; font-size: 13.5px; }
+  .entry-sub {
+    font-size: 11.5px;
+    color: var(--device-muted);
+    margin-top: 3px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .entry-right {
+    font: 600 12px/1 -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--device-accent);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .entry-right.muted { color: var(--device-muted); font-weight: 500; }
+
+  /* Inline tag — small glyph + tiny text annotating a Resume or Pause event.
+     e.g. "Resumed ↶ 30s" or "Paused 🌙". Stays subordinate to the title. */
+  .event-tag {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 3px;
+    margin-left: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--device-accent);
+    vertical-align: baseline;
+  }
+  .event-tag .et-glyph {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .event-tag.sleep { color: var(--sleep); }
+  .event-tag.warn  { color: var(--warn); }
+
+  /* Expandable wrap around a session's inner content.
+     Uses grid-template-rows trick: 0fr → 1fr animates to natural content size. */
+  .expand-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 320ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  .expand-wrap.is-expanded { grid-template-rows: 1fr; }
+  .expand-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Gap label as a toggle target — clickable, with hover affordance + chevron. */
+  .gap-toggle { cursor: pointer; }
+  .gap-toggle:hover .mlabel { color: var(--device-text); }
+  .gap-toggle .chevron {
+    display: inline-block;
+    margin-left: 4px;
+    font-size: 9px;
+    opacity: 0.7;
+    transition: transform 320ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  .gap-toggle.is-expanded .chevron { transform: rotate(180deg); }
+  /* Content swap: summary visible when collapsed; "collapse" affordance
+     (muted, non-italic) visible when expanded. Avoids the bug where the
+     toggle's duration "23m, 2 events" duplicated the inner gap labels. */
+  .gap-toggle .gt-collapse { display: none; }
+  .gap-toggle.is-expanded .gt-summary { display: none; }
+  .gap-toggle.is-expanded .gt-collapse {
+    display: inline;
+    color: var(--device-muted);
+    font-style: normal;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Current-state anchor at the very top of the timeline. Not an event —
+     it represents the live state right now (paused, asleep, playing). */
+  .row-entry.now {
+    padding-top: 18px;
+    padding-bottom: 18px;
+    position: relative;
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), transparent 95%);
+  }
+  body.light .row-entry.now {
+    background: linear-gradient(180deg, rgba(0,0,0,0.04), transparent 95%);
+  }
+  .row-entry.now::after {
+    content: '';
+    position: absolute;
+    left: 16px; right: 16px; bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--device-line), transparent 80%);
+  }
+  .row-entry.now .time-pill {
+    background: var(--device-accent);
+    color: var(--device-bg);
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    font-size: 10.5px;
+    text-transform: uppercase;
+  }
+  .row-entry.now.state-asleep .time-pill { background: var(--sleep); color: var(--device-text); }
+  .row-entry.now.state-playing .time-pill { background: #4ade80; color: #052812; }
+  .row-entry.now .entry-right {
+    color: var(--device-text);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .row-entry.now .entry-sub {
+    font-size: 12px;
+  }
+
+  /* Selected row — the user's marked "jump-to" candidate. Subtle until we
+     wire up actual preview/jump behavior. */
+  .row-entry[data-select] { cursor: pointer; }
+  .row-entry.selected {
+    background: linear-gradient(90deg, rgba(74,222,128,0.10), transparent 85%);
+    box-shadow: inset 3px 0 0 #4ade80;
+  }
+  .row-entry.selected .ico { transform: scale(1.08); transition: transform 160ms ease; }
+
+  /* Micro-event cluster on the line between events */
+  .micro {
+    position: relative;
+    display: grid;
+    grid-template-columns: 76px 36px 1fr auto;
+    align-items: center;
+    column-gap: 8px;
+    padding: 2px 16px;
+    z-index: 1;
+  }
+  .micro .lane {
+    flex-direction: column;
+    gap: 5px;
+    width: 36px;
+    height: auto;
+    padding: 6px 0;
+  }
+  .micro .mdot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--device-line);
+    z-index: 2;
+    position: relative;
+  }
+  .micro .mlabel {
+    font: italic 12.5px/1.2 -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--accent-2);
+    align-self: center;
+  }
+
+  /* Sleep-timer visual treatments — applied to session-start row */
+  .row-entry.has-sleep.treatment-shade {
+    background: linear-gradient(90deg, rgba(91,108,255,0.10), transparent 75%);
+  }
+  .row-entry.has-sleep.treatment-overlay {
+    background: linear-gradient(90deg, rgba(91,108,255,0.16), rgba(91,108,255,0.04));
+    box-shadow: inset 3px 0 0 var(--sleep);
+  }
+  .row-entry.has-sleep.treatment-bracket::after {
+    content: '';
+    position: absolute;
+    left: 6px; top: 10px; bottom: 10px;
+    width: 6px;
+    border: 2px solid var(--sleep);
+    border-right: 0;
+    border-radius: 3px 0 0 3px;
+    opacity: 0.7;
+  }
+
+  /* Period bullet (older history rollup) */
+  .period-bullet { cursor: pointer; }
+
+  /* Density modes */
+  body.density-compact .row-entry { padding-top: 6px; padding-bottom: 6px; }
+  body.density-compact .day-band { padding-top: 14px; }
+  body.density-compact .micro { padding-top: 0; padding-bottom: 0; }
+  body.density-compact .micro .lane { gap: 4px; padding: 4px 0; }
+  body.density-airy .row-entry { padding-top: 16px; padding-bottom: 16px; }
+  body.density-airy .day-band { padding-top: 28px; }
+  body.density-airy .micro { padding-top: 8px; padding-bottom: 8px; }
+  body.density-airy .micro .lane { gap: 8px; padding: 10px 0; }
+
+  /* Event-type visibility toggles */
+  body.cj-hidden .row-entry.ev-chapter { display: none; }
+  body.cj-bold .row-entry.ev-chapter .entry-title { color: var(--accent-2); font-weight: 700; }
+  body.cj-bold .row-entry.ev-chapter .ico.chapter { box-shadow: 0 0 0 4px rgba(200,162,255,0.18); }
+  body.cj-bold .day-band { letter-spacing: 0.12em; }
+
+  body.speed-hidden .row-entry.ev-speed { display: none; }
+  body.speed-subtle .row-entry.ev-speed { opacity: 0.55; }
+  body.speed-subtle .row-entry.ev-speed .ico { opacity: 0.75; }
+
+  body.smart-hidden .row-entry.ev-smart,
+  body.smart-hidden .smart-mark { display: none; }
+  body.smart-pill .smart-mark { display: none; }
+  body.smart-icon .row-entry.ev-smart { display: none; }
+
+  body.show-microrw-off .micro .mdot.rewind { opacity: 0; }
+  body.show-microff-off .micro .mdot.ff { opacity: 0; }
+
+</style>
+</head>
+<body class="density-cozy smart-icon cj-subtle speed-subtle banding-on show-microff-on show-microrw-on">
+<div class="app">
+
+  <!-- ============== CONTROLS ============== -->
+  <aside class="controls">
+    <div class="controls-head">
+      <h1 style="margin:0">Story Time Timeline</h1>
+      <button class="panel-toggle" data-toggle-controls title="Minimize controls">‹</button>
+    </div>
+    <div class="subtitle">Tweak how the listening timeline behaves. Tap any node in the preview to expand it.</div>
+
+    <details class="group" open>
+      <summary>View</summary>
+      <div class="row">
+        <label>Ordering <span style="opacity:0.6">· book-progress parked</span></label>
+        <div class="seg" data-control="viewMode">
+          <button data-val="chrono">Chronological</button>
+          <button data-val="progress" disabled style="opacity:0.4;cursor:not-allowed">Book-progress</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Density</label>
+        <div class="seg" data-control="density">
+          <button data-val="compact">Compact</button>
+          <button data-val="cozy">Cozy</button>
+          <button data-val="airy">Airy</button>
+        </div>
+      </div>
+      <div class="row">
+        <label class="toggle">
+          <span>Subtle day banding</span>
+          <input type="checkbox" data-control="banding" checked />
+          <span class="ind"></span>
+        </label>
+      </div>
+    </details>
+
+    <details class="group">
+      <summary>Sessions</summary>
+      <div class="row">
+        <label>Default state</label>
+        <div class="seg" data-control="sessionDefault">
+          <button data-val="collapsed">Collapsed</button>
+          <button data-val="expanded">Expanded</button>
+        </div>
+      </div>
+      <div class="row">
+        <label class="toggle">
+          <span>Show micro-rewinds when expanded</span>
+          <input type="checkbox" data-control="showMicroRw" checked />
+          <span class="ind"></span>
+        </label>
+      </div>
+      <div class="row">
+        <label class="toggle">
+          <span>Show micro-FFs when expanded</span>
+          <input type="checkbox" data-control="showMicroFf" checked />
+          <span class="ind"></span>
+        </label>
+      </div>
+      <div class="row">
+        <label>Stack co-occurring events within</label>
+        <div class="seg" data-control="stackWindow">
+          <button data-val="0">Off</button>
+          <button data-val="60">1m</button>
+          <button data-val="300">5m</button>
+          <button data-val="900">15m</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="group">
+      <summary>Sleep timer</summary>
+      <div class="row">
+        <label>Treatment</label>
+        <div class="seg" data-control="sleepTreatment">
+          <button data-val="none">None</button>
+          <button data-val="pill">Pill</button>
+          <button data-val="shade">Shade</button>
+          <button data-val="bracket">Bracket</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="group">
+      <summary>Annotations</summary>
+      <div class="row">
+        <label>Smart rewind on resume</label>
+        <div class="seg" data-control="smart">
+          <button data-val="hidden">Hidden</button>
+          <button data-val="icon">Icon</button>
+          <button data-val="pill">Pill event</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Speed change</label>
+        <div class="seg" data-control="speed">
+          <button data-val="hidden">Hidden</button>
+          <button data-val="subtle">Subtle</button>
+          <button data-val="event">Event</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Chapter jump</label>
+        <div class="seg" data-control="cj">
+          <button data-val="hidden">Hidden</button>
+          <button data-val="subtle">Subtle</button>
+          <button data-val="bold">Bold</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="group">
+      <summary>Theme</summary>
+      <div class="row">
+        <label>Mode</label>
+        <div class="seg" data-control="theme">
+          <button data-val="dark">Dark</button>
+          <button data-val="light">Light</button>
+        </div>
+      </div>
+    </details>
+  </aside>
+
+  <!-- ============== PREVIEW ============== -->
+  <main class="preview">
+    <div class="stage">
+      <div class="device" id="device">
+        <div class="notch"></div>
+        <div class="status-bar">
+          <span>9:41</span>
+          <span>●●● 5G ◐</span>
+        </div>
+        <div class="app-header">
+          <div class="app-title">
+            <h2>Timeline</h2>
+            <div class="book">
+              <strong style="color:var(--device-text)">Astrophysics for People in a Hurry</strong><br/>
+              Neil deGrasse Tyson
+            </div>
+          </div>
+          <div class="view-toggle" data-view-toggle>
+            <button data-vt="chrono" class="on">Chronological</button>
+            <button data-vt="progress" title="Coming later — see panel">Book progress <span style="opacity:0.5;font-size:9px">soon</span></button>
+          </div>
+        </div>
+        <div class="scroll" id="scroll">
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============== NARRATIVE PANEL ============== -->
+  <aside class="narrative">
+    <div class="narrative-head">
+      <h2 style="margin:0">What the user did</h2>
+      <button class="panel-toggle" data-toggle-narrative title="Minimize narrative">›</button>
+    </div>
+    <div class="narr-subtitle">The underlying actions, in order. The timeline on the left is the <em>interpretation</em> of these.</div>
+    <ol class="narr-list">
+      <li class="kind-resume">
+        <div class="narr-time">8:00pm</div>
+        <div>
+          <div class="narr-action">Tap play</div>
+          <div class="narr-detail">Start of book, beginning of Chapter 1</div>
+        </div>
+      </li>
+      <li class="kind-pause">
+        <div class="narr-time">8:10pm</div>
+        <div>
+          <div class="narr-action">Tap pause</div>
+          <div class="narr-detail">Manual, after 10 minutes</div>
+        </div>
+      </li>
+      <li class="narr-divider-label">— 30 minutes elapsed, app idle —</li>
+      <li class="kind-resume">
+        <div class="narr-time">8:40pm</div>
+        <div>
+          <div class="narr-action">Tap play</div>
+          <div class="narr-detail">Smart rewind kicks in automatically: −30s before resuming</div>
+        </div>
+      </li>
+      <li class="kind-rewind">
+        <div class="narr-time">8:43pm</div>
+        <div>
+          <div class="narr-action">Tap rewind 30s</div>
+          <div class="narr-detail">Mid-playback, no pause</div>
+        </div>
+      </li>
+      <li class="kind-timer-set">
+        <div class="narr-time">8:48pm</div>
+        <div>
+          <div class="narr-action">Set 15-minute sleep timer</div>
+          <div class="narr-detail">Continues playing; countdown starts</div>
+        </div>
+      </li>
+      <li class="kind-chapter">
+        <div class="narr-time">8:52pm</div>
+        <div>
+          <div class="narr-action">Chapter 1 → Chapter 2</div>
+          <div class="narr-detail">Automatic — audio crossed the boundary</div>
+        </div>
+      </li>
+      <li class="kind-sleep-fire">
+        <div class="narr-time">9:03pm</div>
+        <div>
+          <div class="narr-action">Sleep timer fires</div>
+          <div class="narr-detail">Auto-pause; 15 min after the timer was set</div>
+        </div>
+      </li>
+    </ol>
+
+    <div class="future-stub">
+      <strong>Book progress view → future work</strong>
+      Reordering events by position-in-book instead of clock time
+      raised conceptual issues we haven't resolved: stacking semantics,
+      gap meaning, and re-ordering of "set sleep timer" vs "sleep fires"
+      across sessions. Parked.
+    </div>
+  </aside>
+</div>
+
+<script>
+// ============== STATE ==============
+const DEFAULTS = {
+  viewMode: 'chrono',
+  density: 'cozy',
+  banding: true,
+  sessionDefault: 'collapsed',
+  showMicroRw: true,
+  showMicroFf: true,
+  stackWindow: '60',
+  sleepTreatment: 'shade',
+  smart: 'icon',
+  speed: 'subtle',
+  cj: 'subtle',
+  theme: 'dark',
+};
+const state = { ...DEFAULTS };
+const expanded = new Set();         // session ids manually expanded
+const collapsed = new Set();        // session ids manually collapsed (when default = expanded)
+let periodLoaded = false;
+let selectedKey = null;             // currently-selected row key (e.g. "s1:resume")
+
+// ============== MOCK DATA ==============
+// Three weeks of listening on one book, designed to surface every visual question.
+// Times are local; dates anchored to "today" so day labels stay relative.
+const today = new Date('2026-06-01T22:00:00');
+function d(daysAgo, h, m) {
+  const t = new Date(today); t.setDate(t.getDate() - daysAgo); t.setHours(h, m, 0, 0); return t;
+}
+// Small two-session example. Mirrors the narrative shown in the right panel:
+//
+//   8:00pm  Tap play — start of book, chapter 1
+//   8:10pm  Tap pause (manual, after 10 min)
+//   8:40pm  Tap play — smart rewind kicks in (30s)
+//   8:43pm  Tap rewind 30s (mid-playback, no pause)
+//   8:48pm  Set 15-minute sleep timer
+//   8:52pm  Chapter 1 → Chapter 2 (automatic boundary)
+//   9:03pm  Sleep timer fires → auto-pause
+const sessions = [
+  // Session 1 — short opening
+  { id: 's1',
+    start: d(0, 20, 0),     // 8:00pm
+    end:   d(0, 20, 10),    // 8:10pm
+    durMin: 10,
+    chStart: 1, chEnd: 1,
+    pStart: 0.000,
+    pEnd:   0.021,          // ~10m of 480m book
+    events: [],
+    smartRewindOnResume: false,
+    sleep: null,
+    speed: null,
+  },
+  // Session 2 — resumed 30m later, mid-session rewind, sleep timer fires
+  { id: 's2',
+    start: d(0, 20, 40),    // 8:40pm
+    end:   d(0, 21, 3),     // 9:03pm
+    durMin: 23,
+    chStart: 1, chEnd: 2,
+    pStart: 0.020,          // smart-rewound from ~0.021 back to ~0.020
+    pEnd:   0.068,          // 23m of audio (minus 30s rewind) added
+    events: [
+      { type: 'rewind',  at: d(0, 20, 43), sec: 30 },         // 8:43pm — manual rewind
+      { type: 'chapter', at: d(0, 20, 52), label: 'Chapter 2' },   // 8:52pm — boundary
+    ],
+    smartRewindOnResume: true,
+    sleep: {
+      setAt: d(0, 20, 48),     // 8:48pm — user arms the timer
+      durMin: 15,
+      driftStart: 0.051,        // ~where user fell asleep
+      driftEnd: 0.068,          // where playback was when timer fired
+    },
+    speed: null,
+  },
+];
+
+// Period-bullet rollup is unused for this small example; kept empty.
+const olderSessions = [];
+
+// ============== RENDER ==============
+const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function dayLabel(dt) {
+  const now = new Date(today); now.setHours(0,0,0,0);
+  const day = new Date(dt); day.setHours(0,0,0,0);
+  const diff = Math.round((now - day) / (24*3600*1000));
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7) return dayNames[day.getDay()];
+  return day.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function timeStr(dt) {
+  return dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase().replace(' ', '');
+}
+function durStr(min) {
+  if (min < 60) return `${min} min`;
+  const h = Math.floor(min/60), m = min % 60;
+  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+}
+function progressStr(p) { return Math.round(p*100) + '%'; }
+
+// ============== HELPERS ==============
+const BOOK_TOTAL_SECONDS = 8 * 3600; // mock 8h audiobook → drives the right-side position
+function bookPos(p) {
+  const total = Math.max(0, Math.min(1, p)) * BOOK_TOTAL_SECONDS;
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const pct = Math.round(p * 100);
+  return `${pct}% <span style="opacity:0.75;font-weight:500">(${h}h${String(m).padStart(2,'0')}m)</span>`;
+}
+function ico(kindCls, glyph) {
+  let inner;
+  if (glyph === 'play')       inner = '<span class="glyph-play"></span>';
+  else if (glyph === 'pause') inner = '<span class="glyph-pause"></span>';
+  else if (glyph === 'stop')  inner = '<span class="glyph-stop"></span>';
+  else                        inner = `<span>${glyph}</span>`;
+  return `<div class="ico ${kindCls}">${inner}</div>`;
+}
+
+function isExpanded(s) {
+  if (state.sessionDefault === 'expanded') return !collapsed.has(s.id);
+  return expanded.has(s.id);
+}
+
+// Position an event by where its timestamp falls inside the session's [start,end]
+// window — linear interpolation between pStart and pEnd. More accurate than
+// index-based when events cluster in time.
+function eventBookPos(s, e) {
+  const span = s.end - s.start;
+  if (span <= 0) return s.pStart;
+  const frac = Math.max(0, Math.min(1, (e.at - s.start) / span));
+  return s.pStart + (s.pEnd - s.pStart) * frac;
+}
+
+// ============== COLLAPSED SESSION ==============
+// A collapsed session = its Resume event shown alone, with a small summary
+// of what happened after (events count, duration, ending position).
+// The session itself has no visible boundary chrome.
+// Unified session renderer: always emits [Resume row] + [toggle gap label] +
+// [expand-wrap containing inner content]. The wrap is animated open/closed via
+// a CSS class on click of the toggle gap label.
+function renderSession(s, opts) {
+  opts = opts || {};
+  const isExpandedState = isExpanded(s);
+  const resumeRow = renderResumeRow(s, opts);
+  const toggleGap = renderToggleGap(s, isExpandedState);
+  const innerHTML = renderSessionInner(s, opts);
+
+  const wrap = `
+    <div class="expand-wrap${isExpandedState ? ' is-expanded' : ''}" data-wrap-id="${s.id}">
+      <div class="expand-inner">${innerHTML}</div>
+    </div>
+  `;
+
+  // In reverse-chrono the inner content happened AFTER the Resume,
+  // so it sits ABOVE the gap label and Resume row.
+  return opts.reverse ? (wrap + toggleGap + resumeRow)
+                      : (resumeRow + toggleGap + wrap);
+}
+
+function renderResumeRow(s, opts) {
+  opts = opts || {};
+  const iconCls = opts.latest ? 'resume latest' : 'resume';
+  const smartTag = s.smartRewindOnResume && state.smart !== 'hidden'
+    ? `<span class="event-tag"><span class="et-glyph">↶</span>30s</span>` : '';
+  const selectKey = `${s.id}:resume`;
+  const selectedCls = selectKey === selectedKey ? ' selected' : '';
+  // Position shown: in reverse-chrono (collapsed scanning) we show pEnd —
+  // where the user ended up after this session. In forward (book-progress)
+  // we show pStart, since the journey reads start→end.
+  const pos = opts.reverse ? s.pEnd : s.pStart;
+  // Title carries the chapter the user resumed in — that's the parameter the
+  // icon can't say. Smart-rewind tag rides alongside when present.
+  const chapterLabel = `Chapter ${s.chStart}`;
+  return `
+    <div class="row-entry session${selectedCls}" data-select="${selectKey}">
+      <div class="time-pill">${timeStr(s.start)}</div>
+      <div class="lane">${ico(iconCls, 'play')}</div>
+      <div class="entry-body">
+        <div class="entry-title">${chapterLabel}${smartTag}</div>
+      </div>
+      <div class="entry-right">${bookPos(pos)}</div>
+    </div>
+  `;
+}
+
+function renderToggleGap(s, isExpandedState) {
+  // Both states' content is in the DOM; CSS shows one and hides the other based
+  // on the .is-expanded class. That way the surgical class flip during animation
+  // also swaps the visible label without needing a re-render.
+  const parts = [];
+  if (s.durMin > 0) parts.push(durStr(s.durMin));
+  if (s.events.length > 0) parts.push(`${s.events.length} event${s.events.length===1?'':'s'}`);
+  const summary = parts.join(', ') || 'expand';
+  return `
+    <div class="micro gap-toggle${isExpandedState ? ' is-expanded' : ''}" data-id="${s.id}" data-toggle>
+      <div></div>
+      <div class="lane"></div>
+      <div class="mlabel">
+        <span class="gt-summary">${summary}</span>
+        <span class="gt-collapse">collapse</span>
+        <span class="chevron">▾</span>
+      </div>
+      <div></div>
+    </div>
+  `;
+}
+
+// Inner content: middle events + synthetic Pause (Resume is rendered separately
+// as the always-visible header row).
+function renderSessionInner(s, opts) {
+  opts = opts || {};
+
+  const all = s.events.map(e => ({ ...e }));
+  all.push({
+    type: 'pause',
+    at: s.end,
+    durMin: s.durMin,
+    causedBySleep: !!s.sleep,
+    sleepDurMin: s.sleep ? s.sleep.durMin : 0,
+  });
+  // Sleep-timer-set is a user action that schedules a future state change.
+  // It belongs on the timeline (alongside the eventual pause that it triggers).
+  if (s.sleep && s.sleep.setAt) {
+    all.push({ type: 'sleep-set', at: s.sleep.setAt, durMin: s.sleep.durMin });
+  }
+  if (s.smartRewindOnResume && state.smart === 'pill') {
+    all.push({ type: 'smart', at: new Date(s.start.getTime() + 30*1000), sec: 30 });
+  }
+  all.sort((a,b) => a.at - b.at);
+
+  const isMicro = e => (e.type === 'rewind' || e.type === 'ff');
+  const showMicroExplicitly = e =>
+    (e.type === 'rewind' && state.showMicroRw) ||
+    (e.type === 'ff'     && state.showMicroFf);
+  const isHidden = e => (
+    (e.type === 'speed' && state.speed === 'hidden') ||
+    (e.type === 'chapter' && state.cj === 'hidden') ||
+    (e.type === 'smart' && state.smart === 'hidden')
+  );
+
+  const stackWindowMs = Number(state.stackWindow) * 1000;
+  const items = [];
+  const gaps  = [];
+  let pendingMicros = [];
+  let currentStack = [];
+
+  const closeStack = () => {
+    if (!currentStack.length) return;
+    items.push({
+      kind: currentStack.length === 1 ? 'event' : 'stack',
+      events: currentStack,
+      atStart: currentStack[0].at,
+      atEnd:   currentStack[currentStack.length - 1].at,
+    });
+    gaps.push(pendingMicros);
+    pendingMicros = [];
+    currentStack = [];
+  };
+
+  for (const e of all) {
+    if (isHidden(e)) continue;
+    if (isMicro(e) && !showMicroExplicitly(e)) {
+      closeStack();
+      pendingMicros.push(e);
+      continue;
+    }
+    if (stackWindowMs > 0
+        && currentStack.length
+        && (e.at - currentStack[currentStack.length - 1].at) <= stackWindowMs) {
+      currentStack.push(e);
+    } else {
+      closeStack();
+      currentStack.push(e);
+    }
+  }
+  closeStack();
+
+  // Anchor the first gap to Resume's time (s.start), since Resume sits just
+  // outside the wrap and is the conceptual "previous event" for the inner content.
+  const out = [];
+  let prevAtEnd = s.start;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    const mins = Math.round((item.atStart - prevAtEnd) / 60000);
+    out.push(renderGapLabel(mins, gaps[i].length));
+    if (item.kind === 'event') {
+      const idx = s.events.indexOf(item.events[0]);
+      out.push(renderEventNode(item.events[0], s, idx));
+    } else {
+      out.push(renderStackedNode(item.events, s));
+    }
+    prevAtEnd = item.atEnd;
+  }
+
+  if (opts.reverse) out.reverse();
+  return out.join('');
+}
+
+// Inner gap label — only renders when there's a micro burst to summarize.
+// Pure duration is recoverable from the timestamps on the surrounding rows,
+// so we don't waste a row to repeat it. The toggle-gap (session summary) is
+// still rendered separately when collapsed — that's a different concern.
+function renderGapLabel(durMin, microCount) {
+  if (microCount === 0) return '';
+  const parts = [`${microCount} event${microCount === 1 ? '' : 's'}`];
+  if (durMin > 0) parts.push(durStr(durMin));
+  return `
+    <div class="micro">
+      <div></div>
+      <div class="lane"></div>
+      <div class="mlabel">${parts.join(', ')}</div>
+      <div></div>
+    </div>
+  `;
+}
+
+// The bare parameter for an event — what the action *did*, sans action word.
+// Used by stacked rows to read as "lane-icon param · 🔸 param · 🔸 param".
+function eventParam(e) {
+  if (e.type === 'rewind')    return `${e.sec}s`;
+  if (e.type === 'ff')        return `${e.sec}s`;
+  if (e.type === 'chapter')   return e.label;
+  if (e.type === 'speed')     return `${e.from}× → ${e.to}×`;
+  if (e.type === 'sleep-set') return `${e.durMin}m`;
+  if (e.type === 'smart')     return `${e.sec}s`;
+  return '';
+}
+
+function eventVisual(e) {
+  // Resume + Pause carry no title text — their icons (▶ green ring, ⏸ or Zz)
+  // fully express the transition. Annotations like smart-rewind or sleep-fire
+  // ride as inline tags on top of an empty title slot, never as a redundant label.
+  if (e.type === 'resume')   return { kindCls:'ev-resume',   iconCls:'resume',   glyph:'play',  title:'' };
+  if (e.type === 'pause')    return { kindCls:'ev-pause',    iconCls:e.causedBySleep ? 'sleep-end' : 'pause', glyph:e.causedBySleep ? 'Zz' : 'pause', title:'' };
+  if (e.type === 'sleep-set')return { kindCls:'ev-sleep-set',iconCls:'sleep-set',glyph:'🌙',    title:`Sleep timer set`, sub:`${e.durMin}m countdown` };
+  if (e.type === 'rewind')   return { kindCls:'ev-rewind',   iconCls:'rewind',   glyph:'⏪',     title:`Rewind ${e.sec}s`, muted:true };
+  if (e.type === 'ff')       return { kindCls:'ev-ff',       iconCls:'ff',       glyph:'⏩',     title:`Skip ${e.sec}s`,   muted:true };
+  if (e.type === 'speed')    return { kindCls:'ev-speed',    iconCls:'speed',    glyph:'⚡',     title:`${e.from}× → ${e.to}×` };
+  if (e.type === 'chapter')  return { kindCls:'ev-chapter',  iconCls:'chapter',  glyph:'📖',    title:`${e.label}` };
+  if (e.type === 'smart')    return { kindCls:'ev-smart',    iconCls:'smart',    glyph:'↶',     title:`Smart rewind ${e.sec}s` };
+  return null;
+}
+
+function renderEventNode(e, s, idx) {
+  const v = eventVisual(e);
+  if (!v) return '';
+
+  const isPause = e.type === 'pause';
+
+  // Pause inherits the session-level sleep treatment (row tint/bracket/shade)
+  // when timer-fired. Drift visualization parked — needs more design work.
+  const causedBySleep = isPause && e.causedBySleep;
+  const sleepClass = causedBySleep ? ' has-sleep treatment-' + state.sleepTreatment : '';
+
+  // Position: Pause → session end, otherwise interpolate.
+  const p = isPause ? s.pEnd : eventBookPos(s, e);
+
+  // Sleep-cause glyph on the Pause event when timer-fired.
+  let tag = '';
+  if (isPause && causedBySleep) {
+    tag = `<span class="event-tag sleep"><span class="et-glyph">🌙</span>${e.sleepDurMin}m</span>`;
+  }
+
+  // Selectable rows = Pause (and major events in expanded mode, though we
+  // only wire Pause for now per the user's "main row" framing).
+  const selectKey = isPause ? `${s.id}:pause` : null;
+  const selectAttr = selectKey ? ` data-select="${selectKey}"` : '';
+  const selectedCls = selectKey === selectedKey ? ' selected' : '';
+
+  // Pause inherits the chapter context the user was in when playback stopped
+  // (s.chEnd). For other events the title comes from eventVisual.
+  const titleText = isPause ? `Chapter ${s.chEnd}` : v.title;
+  const titleContent = `${titleText}${tag}`;
+  const titleHTML = titleContent
+    ? `<div class="entry-title${v.muted ? ' muted' : ''}">${titleContent}</div>`
+    : '';
+
+  return `
+    <div class="row-entry event ${v.kindCls}${sleepClass}${selectedCls}" data-id="${s.id}"${selectAttr}>
+      <div class="time-pill">${timeStr(e.at)}</div>
+      <div class="lane">${ico(v.iconCls, v.glyph)}</div>
+      <div class="entry-body">
+        ${titleHTML}
+        ${v.sub ? `<div class="entry-sub">${v.sub}</div>` : ''}
+      </div>
+      <div class="entry-right${v.muted ? ' muted' : ''}">${bookPos(p)}</div>
+    </div>
+  `;
+}
+
+// Tight burst of user actions in execution order, rendered as a single row
+// with an inline action-sequence in the title: "lane-icon param · 🔸 param · 🔸 param".
+// Lane shows just the first action's icon — no more overlapping circles.
+function renderStackedNode(events, s) {
+  // Chronological order — read the title left-to-right as the sequence of actions.
+  const ordered = [...events].sort((a, b) => a.at - b.at);
+  const first = ordered[0];
+  const rest  = ordered.slice(1);
+
+  const firstV = eventVisual(first);
+  if (!firstV) return '';
+
+  const restHTML = rest.map(e => {
+    const v = eventVisual(e);
+    if (!v) return '';
+    return `<span class="seq-step"><span class="seq-glyph">${v.glyph === 'play' ? '▶' : v.glyph === 'pause' ? '⏸' : v.glyph}</span>${eventParam(e)}</span>`;
+  }).join('');
+
+  const pos = bookPos(eventBookPos(s, first));
+  const titleHTML = `${eventParam(first)}${restHTML}`;
+
+  return `
+    <div class="row-entry event stacked ${firstV.kindCls}" data-id="${s.id}">
+      <div class="time-pill">${timeStr(first.at)}</div>
+      <div class="lane">${ico(firstV.iconCls, firstV.glyph)}</div>
+      <div class="entry-body">
+        <div class="entry-title">${titleHTML}</div>
+      </div>
+      <div class="entry-right">${pos}</div>
+    </div>
+  `;
+}
+
+// ============== CURRENT-STATE ANCHOR ==============
+// The very first row in chronological view: where the user is RIGHT NOW.
+// Not an event (no past timestamp) — an ongoing state. Derived from the most
+// recent session: open session → playing; closed-by-sleep → asleep; otherwise
+// manually paused.
+function renderNowRow() {
+  if (!sessions.length) return '';
+  const latest = [...sessions].sort((a, b) => b.end - a.end)[0];
+  const isAsleep  = !!latest.sleep;
+  const isPlaying = false; // would be true if the latest session had no pause yet
+  const stateCls = isPlaying ? 'state-playing' : (isAsleep ? 'state-asleep' : 'state-paused');
+  const iconCls  = isPlaying ? 'resume latest' : (isAsleep ? 'sleep-end' : 'pause');
+  const glyph    = isPlaying ? 'play' : (isAsleep ? 'Zz' : 'pause');
+  return `
+    <div class="row-entry now ${stateCls}">
+      <div class="time-pill">Now</div>
+      <div class="lane">${ico(iconCls, glyph)}</div>
+      <div class="entry-body">
+        <div class="entry-sub">since ${timeStr(latest.end)}</div>
+      </div>
+      <div class="entry-right">${bookPos(latest.pEnd)}</div>
+    </div>
+  `;
+}
+
+// ============== GAP / PERIOD ==============
+function renderPeriodBullet() {
+  // Nothing older than the loaded sessions — no rollup to show.
+  if (!olderSessions.length) return '';
+  if (periodLoaded) {
+    return olderSessions.map(s => renderSession(s)).join('') +
+      `<div class="row-entry period-bullet" data-period-collapse>
+        <div class="time-pill">⋯</div>
+        <div class="lane">${ico('period', '⋯')}</div>
+        <div class="entry-body">
+          <div class="entry-title muted">Collapse older history</div>
+          <div class="entry-sub">Hide the past 2+ weeks</div>
+        </div>
+        <div></div>
+      </div>`;
+  }
+  return `
+    <div class="row-entry period-bullet" data-period-load>
+      <div class="time-pill">2w+</div>
+      <div class="lane">${ico('period', '⋯')}</div>
+      <div class="entry-body">
+        <div class="entry-title">Earlier · 2+ weeks ago</div>
+        <div class="entry-sub">3 sessions · Ch 1–3 · first 17% of book</div>
+      </div>
+      <div class="entry-right" style="color:var(--device-accent)">tap</div>
+    </div>
+  `;
+}
+
+// ============== TWO VIEW MODES ==============
+function renderChronological() {
+  const all = [...sessions].sort((a,b) => b.start - a.start);
+  const out = [];
+  out.push(renderNowRow()); // current-state anchor at the very top
+  let lastDayKey = null;
+  let isFirst = true;
+
+  for (const s of all) {
+    const dayKey = s.start.toDateString();
+    if (dayKey !== lastDayKey) {
+      out.push(`
+        <div class="day-band">
+          <span class="day-label">${dayLabel(s.start)}</span>
+          <span class="day-sub">${s.start.toLocaleDateString('en-US', { month:'short', day:'numeric' })}</span>
+        </div>
+      `);
+      lastDayKey = dayKey;
+    }
+    out.push(renderSession(s, { reverse: true, latest: isFirst }));
+    isFirst = false;
+  }
+  out.push(renderPeriodBullet());
+  return out.join('');
+}
+
+function renderProgress() {
+  const all = [...sessions, ...(periodLoaded ? olderSessions : [])].sort((a,b) => a.pStart - b.pStart);
+  const out = [];
+  let lastBand = null;
+  for (const s of all) {
+    const band = `Ch ${s.chStart}${s.chEnd !== s.chStart ? '–' + s.chEnd : ''}`;
+    if (band !== lastBand) {
+      out.push(`
+        <div class="day-band">
+          <span class="day-label">${band}</span>
+          <span class="day-sub">${progressStr(s.pStart)} – ${progressStr(s.pEnd)} of book</span>
+        </div>
+      `);
+      lastBand = band;
+    }
+    const rendered = renderSession(s);
+    // Swap the first time-pill to show the day label rather than clock-time
+    out.push(rendered.replace(
+      `<div class="time-pill">${timeStr(s.start)}</div>`,
+      `<div class="time-pill">${dayLabel(s.start).slice(0,3).toUpperCase()}</div>`
+    ));
+  }
+  if (!periodLoaded) out.push(renderPeriodBullet());
+  return out.join('');
+}
+
+function render() {
+  // body classes
+  const body = document.body;
+  body.className = '';
+  body.classList.add('density-' + state.density);
+  body.classList.add('smart-' + state.smart);
+  body.classList.add('cj-' + state.cj);
+  body.classList.add('speed-' + state.speed);
+  if (state.banding) body.classList.add('banding-on');
+  body.classList.add('show-microff-' + (state.showMicroFf ? 'on' : 'off'));
+  body.classList.add('show-microrw-' + (state.showMicroRw ? 'on' : 'off'));
+  if (state.theme === 'light') body.classList.add('light');
+
+  // view toggle in device
+  document.querySelectorAll('[data-vt]').forEach(b => {
+    b.classList.toggle('on', b.dataset.vt === state.viewMode);
+  });
+
+  const tl = document.getElementById('timeline');
+  // Book-progress view is parked — see narrative panel. Force chrono.
+  tl.innerHTML = renderChronological();
+
+  // Gap labels with [data-toggle] expand/collapse their session.
+  // We flip the JS state AND surgically toggle the CSS class on the existing
+  // wrap, so the height transition has a stable element to animate.
+  tl.querySelectorAll('[data-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = el.dataset.id;
+      if (state.sessionDefault === 'expanded') {
+        if (collapsed.has(id)) collapsed.delete(id); else collapsed.add(id);
+      } else {
+        if (expanded.has(id)) expanded.delete(id); else expanded.add(id);
+      }
+      const wrap = tl.querySelector(`.expand-wrap[data-wrap-id="${id}"]`);
+      if (wrap) wrap.classList.toggle('is-expanded');
+      el.classList.toggle('is-expanded');
+    });
+  });
+
+  // Selectable rows ("set this as current location"). Click toggles selection;
+  // visual only for now, ready to wire to preview/jump behavior later.
+  tl.querySelectorAll('[data-select]').forEach(el => {
+    el.addEventListener('click', () => {
+      const key = el.dataset.select;
+      tl.querySelectorAll('[data-select].selected').forEach(x => x.classList.remove('selected'));
+      if (selectedKey === key) {
+        selectedKey = null;
+      } else {
+        el.classList.add('selected');
+        selectedKey = key;
+      }
+    });
+  });
+
+  tl.querySelectorAll('[data-period-load]').forEach(el => {
+    el.addEventListener('click', () => { periodLoaded = true; render(); });
+  });
+  tl.querySelectorAll('[data-period-collapse]').forEach(el => {
+    el.addEventListener('click', () => { periodLoaded = false; render(); });
+  });
+}
+
+// ============== CONTROL WIRING ==============
+function setVal(key, val) {
+  state[key] = val;
+  render();
+}
+
+document.querySelectorAll('.seg').forEach(seg => {
+  const key = seg.dataset.control;
+  seg.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      seg.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      setVal(key, b.dataset.val);
+    });
+  });
+});
+
+document.querySelectorAll('input[type=checkbox][data-control]').forEach(cb => {
+  cb.addEventListener('change', () => setVal(cb.dataset.control, cb.checked));
+});
+
+// in-device view toggle. Book-progress is parked; clicking it pulses the stub
+// but does not switch modes — we always render chronological for now.
+document.querySelectorAll('[data-vt]').forEach(b => {
+  b.addEventListener('click', () => {
+    const v = b.dataset.vt;
+    if (v === 'progress') {
+      const stub = document.querySelector('.future-stub');
+      if (stub) {
+        stub.style.transition = 'background 200ms ease';
+        stub.style.background = 'rgba(138,180,255,0.10)';
+        setTimeout(() => { stub.style.background = ''; }, 600);
+      }
+      return;
+    }
+    state.viewMode = v;
+    document.querySelectorAll('[data-control="viewMode"] button').forEach(x => {
+      x.classList.toggle('on', x.dataset.val === v);
+    });
+    render();
+  });
+});
+
+// Sync side-panel controls to the current state on init.
+function syncControlsFromState() {
+  document.querySelectorAll('.seg').forEach(seg => {
+    const key = seg.dataset.control;
+    seg.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('on', b.dataset.val === state[key]);
+    });
+  });
+  document.querySelectorAll('input[type=checkbox][data-control]').forEach(cb => {
+    cb.checked = !!state[cb.dataset.control];
+  });
+}
+
+// ============== PANEL TOGGLES ==============
+document.querySelector('[data-toggle-controls]')?.addEventListener('click', () => {
+  document.querySelector('.app').classList.toggle('controls-min');
+});
+document.querySelector('[data-toggle-narrative]')?.addEventListener('click', () => {
+  document.querySelector('.app').classList.toggle('narrative-min');
+});
+
+// ============== INIT ==============
+// Default-expand the latest session so the user opens to "this is what just
+// happened" rather than a wall of summary rows. User can collapse manually.
+const latestSession = sessions.length
+  ? [...sessions].sort((a, b) => b.start - a.start)[0]
+  : null;
+if (latestSession) expanded.add(latestSession.id);
+
+syncControlsFromState();
+render();
+</script>
+</body>
+</html>
