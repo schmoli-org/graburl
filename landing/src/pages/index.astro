@@ -1,0 +1,597 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Snag it — Copy any URL instantly">
+  <!-- ── Nav ── -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="nb" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#4AB5FF"/>
+              <stop offset="100%" stop-color="#0055C9"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#nb)"/>
+          <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </g>
+        </svg>
+        <span>Snag it</span>
+      </a>
+      <a href="#install" class="btn btn-sm">Add to Safari</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- ── Hero ── -->
+    <section class="hero">
+      <svg class="hero-icon" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="hb" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#4AB5FF"/>
+            <stop offset="100%" stop-color="#0055C9"/>
+          </linearGradient>
+          <linearGradient id="hs" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="white" stop-opacity="0.2"/>
+            <stop offset="50%" stop-color="white" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#hb)"/>
+        <rect width="120" height="120" rx="26" fill="url(#hs)"/>
+        <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </g>
+      </svg>
+
+      <h1>Snag it</h1>
+      <p class="tagline">Copy any URL instantly.</p>
+      <p class="description">
+        A Safari extension that puts the current page's URL on your clipboard with a single click. Nothing more, nothing less.
+      </p>
+      <div class="hero-actions">
+        <a href="#install" class="btn btn-lg">Add to Safari</a>
+      </div>
+      <p class="availability">Safari · macOS</p>
+    </section>
+
+    <!-- ── Demo strip ── -->
+    <div class="demo-strip">
+      <div class="demo-inner">
+        <div class="toolbar-mock" aria-label="Safari toolbar demo">
+          <div class="toolbar-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="address-bar">
+            <span class="address-lock">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <span class="address-text">anthropic.com/research</span>
+          </div>
+          <div class="toolbar-ext">
+            <svg width="16" height="16" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+              <rect width="120" height="120" rx="20" fill="#0077ED"/>
+              <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="demo-arrow">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </div>
+        <div class="clipboard-mock">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+          </svg>
+          <span>anthropic.com/research</span>
+          <span class="copied-badge">Copied!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Features ── -->
+    <section class="features">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0077ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
+          <h3>One click</h3>
+          <p>Click the toolbar icon. URL copied. That's the entire workflow — no popups, no menus, no confirmation dialogs.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0077ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h3>Private by design</h3>
+          <p>Reads only the current tab's URL. No network requests, no tracking, no data ever leaves your device.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrap">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0077ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h3>Zero setup</h3>
+          <p>Install and you're done. No account, no preferences panel, no onboarding flow to click through.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Install CTA ── -->
+    <section id="install" class="install">
+      <div class="install-inner">
+        <svg width="72" height="72" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="install-icon">
+          <defs>
+            <linearGradient id="ib" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#4AB5FF"/>
+              <stop offset="100%" stop-color="#0055C9"/>
+            </linearGradient>
+            <linearGradient id="is" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="white" stop-opacity="0.2"/>
+              <stop offset="50%" stop-color="white" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#ib)"/>
+          <rect width="120" height="120" rx="26" fill="url(#is)"/>
+          <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </g>
+        </svg>
+        <h2>Ready to snag?</h2>
+        <p>Coming soon to the Safari Extensions Gallery on the Mac App Store.</p>
+        <a href="#" class="btn btn-lg btn-outline">Notify me when it ships</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <a href="/" class="footer-brand">
+        <svg width="18" height="18" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="fb" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#4AB5FF"/>
+              <stop offset="100%" stop-color="#0055C9"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#fb)"/>
+          <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </g>
+        </svg>
+        Snag it
+      </a>
+      <span class="footer-divider">·</span>
+      <a href="#">Privacy</a>
+      <span class="footer-copy">© 2026</span>
+    </div>
+  </footer>
+</Layout>
+
+<style>
+  /* ── Nav ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 9px 20px;
+    border-radius: 980px;
+    text-decoration: none;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+    border: none;
+    background: var(--blue);
+    color: white;
+  }
+
+  .btn:hover {
+    background: var(--blue-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 85, 201, 0.38);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+  .btn-sm {
+    font-size: 14px;
+    padding: 7px 16px;
+  }
+
+  .btn-lg {
+    font-size: 17px;
+    padding: 14px 32px;
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--blue);
+    box-shadow: inset 0 0 0 1.5px var(--blue);
+  }
+
+  .btn-outline:hover {
+    background: var(--blue);
+    color: white;
+    box-shadow: 0 6px 20px rgba(0, 85, 201, 0.38);
+  }
+
+  /* ── Hero ── */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 80px 24px 64px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .hero-icon {
+    width: 140px;
+    height: 140px;
+    border-radius: 31px;
+    box-shadow:
+      0 24px 64px rgba(0, 85, 201, 0.32),
+      0 4px 16px rgba(0, 0, 0, 0.1);
+    margin-bottom: 36px;
+  }
+
+  h1 {
+    font-size: clamp(52px, 9vw, 80px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .tagline {
+    font-size: clamp(22px, 3.5vw, 30px);
+    font-weight: 500;
+    color: var(--blue);
+    margin-bottom: 20px;
+    letter-spacing: -0.01em;
+  }
+
+  .description {
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--text-2);
+    max-width: 520px;
+    margin-bottom: 36px;
+  }
+
+  .hero-actions {
+    margin-bottom: 16px;
+  }
+
+  .availability {
+    font-size: 13px;
+    color: var(--text-2);
+    letter-spacing: 0.01em;
+  }
+
+  /* ── Demo strip ── */
+  .demo-strip {
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 40px 24px;
+  }
+
+  .demo-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-mock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-radius: 12px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.06);
+    min-width: 280px;
+  }
+
+  .toolbar-dots {
+    display: flex;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+
+  .toolbar-dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d2d2d7;
+  }
+
+  .toolbar-dots span:nth-child(1) { background: #fc5f57; }
+  .toolbar-dots span:nth-child(2) { background: #fdbc2c; }
+  .toolbar-dots span:nth-child(3) { background: #34c749; }
+
+  .address-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg-alt);
+    border-radius: 7px;
+    padding: 5px 10px;
+    font-size: 13px;
+    color: var(--text-2);
+    min-width: 0;
+  }
+
+  .address-lock {
+    flex-shrink: 0;
+    color: var(--text-2);
+    display: flex;
+  }
+
+  .address-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+  }
+
+  .toolbar-ext {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-alt);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .toolbar-ext:hover {
+    background: #e8e8ed;
+  }
+
+  .demo-arrow {
+    color: var(--text-2);
+    flex-shrink: 0;
+  }
+
+  .clipboard-mock {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.06);
+    font-size: 13px;
+    color: var(--text-2);
+  }
+
+  .copied-badge {
+    background: #34c749;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 980px;
+    flex-shrink: 0;
+  }
+
+  /* ── Features ── */
+  .features {
+    padding: 80px 24px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    background: var(--bg-alt);
+    border-radius: 20px;
+    padding: 32px;
+  }
+
+  .feature-icon-wrap {
+    width: 52px;
+    height: 52px;
+    background: white;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .feature-card h3 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+
+  .feature-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  /* ── Install CTA ── */
+  .install {
+    background: var(--bg-alt);
+    border-top: 1px solid var(--border);
+    padding: 80px 24px;
+  }
+
+  .install-inner {
+    max-width: 540px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .install-icon {
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0, 85, 201, 0.25), 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 8px;
+  }
+
+  .install-inner h2 {
+    font-size: clamp(30px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .install-inner p {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.5;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .footer-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-2);
+    flex-wrap: wrap;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .footer-divider {
+    color: var(--border);
+  }
+
+  .footer a {
+    color: var(--text-2);
+    text-decoration: none;
+  }
+
+  .footer a:hover {
+    color: var(--text);
+  }
+
+  .footer-copy {
+    margin-left: auto;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .hero {
+      padding: 60px 20px 48px;
+    }
+
+    .hero-icon {
+      width: 112px;
+      height: 112px;
+      border-radius: 25px;
+    }
+
+    .toolbar-mock {
+      min-width: unset;
+      width: 100%;
+    }
+
+    .demo-inner {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .demo-arrow {
+      transform: rotate(90deg);
+      align-self: center;
+    }
+  }
+</style>

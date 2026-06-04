@@ -1,0 +1,60 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'A Safari extension that copies the current page URL to your clipboard with one click.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/icon.svg" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <style>
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --blue: #0077ED;
+        --blue-dark: #0055C9;
+        --blue-light: #4AB5FF;
+        --text: #1d1d1f;
+        --text-2: #6e6e73;
+        --bg: #fff;
+        --bg-alt: #f5f5f7;
+        --border: rgba(0, 0, 0, 0.08);
+      }
+
+      html {
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        color: var(--text);
+        background: var(--bg);
+      }
+
+      body {
+        min-height: 100dvh;
+      }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
