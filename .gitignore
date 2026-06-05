@@ -1,0 +1,24 @@
+.DS_Store
+
+# Local secrets / machine config
+.env
+.env.local
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+
+# Xcode / SwiftPM
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdata/
+*.xcuserdatad/
+*.xccheckout
+*.xcscmblueprint
+
+# Claude Code / Superpowers
+.superpowers/
+.claude/worktrees/
+.claude/plans/
+docs/superpowers/plans/

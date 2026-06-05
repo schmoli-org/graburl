@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "GrabURL",
+  "description": "Copy the active Safari tab URL to the clipboard.",
+  "version": "0.1.0",
+  "permissions": ["activeTab", "clipboardWrite"],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "GrabURL",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+C",
+        "mac": "Command+Shift+C"
+      },
+      "description": "GrabURL"
+    }
+  }
+}

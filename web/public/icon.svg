@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#4AB5FF"/>
+      <stop offset="100%" stop-color="#0055C9"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="white" stop-opacity="0.18"/>
+      <stop offset="50%" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- App icon background -->
+  <rect width="120" height="120" rx="26" fill="url(#bg)"/>
+  <!-- Subtle top shine -->
+  <rect width="120" height="120" rx="26" fill="url(#shine)"/>
+
+  <!-- Chain-link icon scaled from 24×24 Feather paths into the 80×80 center area -->
+  <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+  </g>
+</svg>
