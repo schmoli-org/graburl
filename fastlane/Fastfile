@@ -11,7 +11,7 @@ platform :mac do
     )
   end
 
-  desc "Build Release .pkg and upload to App Store Connect"
+  desc "Build Release .pkg, upload to TestFlight, and distribute to the 'auto' internal group"
   lane :release do
     certs
     increment_build_number(xcodeproj: "GrabURL/GrabURL.xcodeproj")
@@ -39,11 +39,28 @@ platform :mac do
     )
     pkg_path = lane_context[SharedValues::PKG_OUTPUT_PATH]
     UI.user_error!("No .pkg was produced — Mac App Store upload requires a signed pkg") unless pkg_path && File.exist?(pkg_path)
-    upload_to_app_store(
+    upload_to_testflight(
       pkg: pkg_path,
-      skip_metadata: true,
-      skip_screenshots: true,
-      run_precheck_before_submit: false
+      app_platform: "osx",
+      groups: ["auto"],
+      # 'auto' is an internal group; without this pilot would submit the build
+      # for Beta App Review (external-testing flow) and fail on missing Test Info.
+      submit_beta_review: false,
+      skip_waiting_for_build_processing: false
+    )
+  end
+
+  desc "Promote the latest TestFlight build to the external 'beta' group"
+  lane :promote do
+    upload_to_testflight(
+      distribute_only: true, # no build/upload — distributes the latest processed build
+      app_platform: "osx",
+      groups: ["beta"],
+      distribute_external: true,
+      # External groups require Beta App Review; first build of each version
+      # waits in review (<24h typically), later builds are near-instant.
+      submit_beta_review: true,
+      changelog: ENV.fetch("CHANGELOG", "Bug fixes and improvements")
     )
   end
 end

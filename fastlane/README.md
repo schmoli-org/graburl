@@ -29,7 +29,15 @@ Sync App Store signing certificates via match
 [bundle exec] fastlane mac release
 ```
 
-Build Release .pkg and upload to App Store Connect
+Build Release .pkg, upload to TestFlight, and distribute to the 'auto' internal group
+
+### mac promote
+
+```sh
+[bundle exec] fastlane mac promote
+```
+
+Promote the latest TestFlight build to the external 'beta' group
 
 ----
 

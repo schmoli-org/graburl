@@ -1,21 +1,17 @@
 SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help build open test release web web-deploy web-publish
-
-# ── Help ──────────────────────────────────────────────────────────────────────
+.PHONY: help build open test certs release promote web web-deploy web-publish
 
 help: ## Show this help
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
-	  awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@awk 'BEGIN {FS = ":.*?## "} \
+	  /^##@/ {printf "\n\033[1m%s\033[0m\n", substr($$0, 5)} \
+	  /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-# ── Build ─────────────────────────────────────────────────────────────────────
+##@ Build
 
 build: ## Build the macOS app (signed)
 	pnpm build:mac
-
-release: ## Build Release and upload to App Store (requires fastlane + certs)
-	bundle exec fastlane release
 
 open: ## Open the Xcode project
 	open GrabURL/GrabURL.xcodeproj
@@ -23,7 +19,18 @@ open: ## Open the Xcode project
 test: ## Run tests
 	pnpm test
 
-# ── Web ───────────────────────────────────────────────────────────────────────
+##@ Release
+
+certs: ## Sync App Store signing certificates via match
+	bundle exec fastlane certs
+
+release: ## Build, upload to TestFlight, distribute to internal 'auto' group
+	bundle exec fastlane release
+
+promote: ## Promote latest TestFlight build to external 'beta' (set CHANGELOG=...)
+	bundle exec fastlane promote
+
+##@ Web
 
 web: ## Run Astro dev server for web/ and open browser
 	@$(SCRIPTS)/web.sh
