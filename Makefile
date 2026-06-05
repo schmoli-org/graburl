@@ -1,7 +1,7 @@
 SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help build open test web web-deploy web-publish
+.PHONY: help build open test release web web-deploy web-publish
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 
@@ -13,6 +13,9 @@ help: ## Show this help
 
 build: ## Build the macOS app (signed)
 	pnpm build:mac
+
+release: ## Build Release and upload to App Store (requires fastlane + certs)
+	bundle exec fastlane release
 
 open: ## Open the Xcode project
 	open GrabURL/GrabURL.xcodeproj
