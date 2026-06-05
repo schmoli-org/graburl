@@ -19,7 +19,9 @@ platform :mac do
       scheme: "GrabURL",
       configuration: "Release",
       export_method: "app-store",
-      output_directory: "build/release"
+      output_directory: "build/release",
+      xcargs: "DEVELOPMENT_TEAM=#{ENV['DEVELOPMENT_TEAM']}",
+      skip_package_pkg: true
     )
     upload_to_app_store(
       skip_metadata: true,
