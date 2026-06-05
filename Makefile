@@ -27,7 +27,7 @@ certs: ## Sync App Store signing certificates via match
 release: ## Build, upload to TestFlight, distribute to internal 'auto' group
 	bundle exec fastlane release
 
-promote: ## Promote latest TestFlight build to external 'beta' (set CHANGELOG=...)
+promote: ## Promote latest TestFlight build to external 'beta' (CHANGELOG="<what to test>")
 	bundle exec fastlane promote
 
 ##@ Web
