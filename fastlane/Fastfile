@@ -1,0 +1,66 @@
+default_platform(:mac)
+
+platform :mac do
+  desc "Sync App Store signing certificates via match"
+  lane :certs do
+    match(
+      type: "appstore",
+      platform: "macos",
+      app_identifier: ["com.schmoli.graburl", "com.schmoli.graburl.Extension"],
+      additional_cert_types: ["mac_installer_distribution"]
+    )
+  end
+
+  desc "Build Release .pkg, upload to TestFlight, and distribute to the 'auto' internal group"
+  lane :release do
+    certs
+    increment_build_number(xcodeproj: "GrabURL/GrabURL.xcodeproj")
+    # Several "Apple Distribution" identities share a name in the local keychain;
+    # pin the export to the exact certificate embedded in the match profile.
+    profile_path = ENV.fetch("sigh_com.schmoli.graburl_appstore_macos_profile-path")
+    signing_cert_sha = sh(
+      "security cms -D -i '#{profile_path}' | " \
+      "plutil -extract DeveloperCertificates.0 raw - | base64 -d | " \
+      "openssl x509 -inform der -noout -fingerprint -sha1 | " \
+      "sed -E 's/.*=//; s/://g'",
+      log: false
+    ).strip
+    build_mac_app(
+      project: "GrabURL/GrabURL.xcodeproj",
+      scheme: "GrabURL",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "build/release",
+      xcargs: "DEVELOPMENT_TEAM=#{ENV['DEVELOPMENT_TEAM']}",
+      export_options: {
+        signingCertificate: signing_cert_sha,
+        installerSigningCertificate: "3rd Party Mac Developer Installer"
+      }
+    )
+    pkg_path = lane_context[SharedValues::PKG_OUTPUT_PATH]
+    UI.user_error!("No .pkg was produced — Mac App Store upload requires a signed pkg") unless pkg_path && File.exist?(pkg_path)
+    upload_to_testflight(
+      pkg: pkg_path,
+      app_platform: "osx",
+      groups: ["auto"],
+      # 'auto' is an internal group; without this pilot would submit the build
+      # for Beta App Review (external-testing flow) and fail on missing Test Info.
+      submit_beta_review: false,
+      skip_waiting_for_build_processing: false
+    )
+  end
+
+  desc "Promote the latest TestFlight build to the external 'beta' group"
+  lane :promote do
+    upload_to_testflight(
+      distribute_only: true, # no build/upload — distributes the latest processed build
+      app_platform: "osx",
+      groups: ["beta"],
+      distribute_external: true,
+      # External groups require Beta App Review; first build of each version
+      # waits in review (<24h typically), later builds are near-instant.
+      submit_beta_review: true,
+      changelog: ENV.fetch("CHANGELOG", "Bug fixes and improvements")
+    )
+  end
+end

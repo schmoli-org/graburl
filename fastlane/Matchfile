@@ -1,0 +1,5 @@
+git_url ENV["MATCH_GIT_URL"]
+storage_mode "git"
+type "appstore"
+platform "macos"
+app_identifier ["com.schmoli.graburl", "com.schmoli.graburl.Extension"]
