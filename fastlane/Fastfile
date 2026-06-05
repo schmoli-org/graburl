@@ -6,7 +6,8 @@ platform :mac do
     match(
       type: "appstore",
       platform: "macos",
-      app_identifier: ["com.schmoli.graburl", "com.schmoli.graburl.Extension"]
+      app_identifier: ["com.schmoli.graburl", "com.schmoli.graburl.Extension"],
+      additional_cert_types: ["mac_installer_distribution"]
     )
   end
 
@@ -14,6 +15,16 @@ platform :mac do
   lane :release do
     certs
     increment_build_number(xcodeproj: "GrabURL/GrabURL.xcodeproj")
+    # Several "Apple Distribution" identities share a name in the local keychain;
+    # pin the export to the exact certificate embedded in the match profile.
+    profile_path = ENV.fetch("sigh_com.schmoli.graburl_appstore_macos_profile-path")
+    signing_cert_sha = sh(
+      "security cms -D -i '#{profile_path}' | " \
+      "plutil -extract DeveloperCertificates.0 raw - | base64 -d | " \
+      "openssl x509 -inform der -noout -fingerprint -sha1 | " \
+      "sed -E 's/.*=//; s/://g'",
+      log: false
+    ).strip
     build_mac_app(
       project: "GrabURL/GrabURL.xcodeproj",
       scheme: "GrabURL",
@@ -21,11 +32,18 @@ platform :mac do
       export_method: "app-store",
       output_directory: "build/release",
       xcargs: "DEVELOPMENT_TEAM=#{ENV['DEVELOPMENT_TEAM']}",
-      skip_package_pkg: true
+      export_options: {
+        signingCertificate: signing_cert_sha,
+        installerSigningCertificate: "3rd Party Mac Developer Installer"
+      }
     )
+    pkg_path = lane_context[SharedValues::PKG_OUTPUT_PATH]
+    UI.user_error!("No .pkg was produced — Mac App Store upload requires a signed pkg") unless pkg_path && File.exist?(pkg_path)
     upload_to_app_store(
+      pkg: pkg_path,
       skip_metadata: true,
-      skip_screenshots: true
+      skip_screenshots: true,
+      run_precheck_before_submit: false
     )
   end
 end
