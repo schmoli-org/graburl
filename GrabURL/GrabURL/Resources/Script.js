@@ -1,8 +1,8 @@
 function show(enabled, useSettingsInsteadOfPreferences) {
     if (useSettingsInsteadOfPreferences) {
-        document.getElementsByClassName('state-on')[0].innerText = "Safari Copy URL’s extension is currently on. You can turn it off in the Extensions section of Safari Settings.";
-        document.getElementsByClassName('state-off')[0].innerText = "Safari Copy URL’s extension is currently off. You can turn it on in the Extensions section of Safari Settings.";
-        document.getElementsByClassName('state-unknown')[0].innerText = "You can turn on Safari Copy URL’s extension in the Extensions section of Safari Settings.";
+        document.getElementsByClassName('state-on')[0].innerText = "GrabURL’s extension is currently on. You can turn it off in the Extensions section of Safari Settings.";
+        document.getElementsByClassName('state-off')[0].innerText = "GrabURL’s extension is currently off. You can turn it on in the Extensions section of Safari Settings.";
+        document.getElementsByClassName('state-unknown')[0].innerText = "You can turn on GrabURL’s extension in the Extensions section of Safari Settings.";
         document.getElementsByClassName('open-preferences')[0].innerText = "Quit and Open Safari Settings…";
     }
 
