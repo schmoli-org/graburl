@@ -26,7 +26,7 @@
         "default": "Ctrl+Shift+C",
         "mac": "Command+Shift+C"
       },
-      "description": "GrabURL"
+      "description": "Copy active tab URL to clipboard"
     }
   }
 }

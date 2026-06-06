@@ -1,4 +1,10 @@
 (function (global) {
+  /**
+   * Returns the URL of the currently active tab in the current window.
+   * @param {object} tabsApi - Browser tabs API with a Promise-based query() method (e.g., browser.tabs or chrome.tabs in MV3).
+   * @returns {Promise<string>} The active tab's URL.
+   * @throws {Error} If no active tab URL is found.
+   */
   async function getActiveTabUrl(tabsApi) {
     const [tab] = await tabsApi.query({ active: true, currentWindow: true });
     const url = tab?.url;
@@ -10,6 +16,16 @@
     return url;
   }
 
+  /**
+   * Copies text to the clipboard using the Clipboard API if available,
+   * falling back to the legacy document.execCommand('copy') approach.
+   * @param {string} text - The text to copy.
+   * @param {object} [options={}]
+   * @param {object} [options.document] - The DOM document (required for execCommand fallback).
+   * @param {object} [options.clipboard] - The Clipboard API object (navigator.clipboard).
+   * @returns {Promise<void>}
+   * @throws {Error} If clipboard.writeText() rejects, execCommand('copy') returns false, or no clipboard method is available.
+   */
   async function copyTextToClipboard(text, { document, clipboard } = {}) {
     if (clipboard?.writeText) {
       await clipboard.writeText(text);
@@ -55,6 +71,15 @@
     throw new Error("Clipboard API unavailable");
   }
 
+  /**
+   * Copies the active tab's URL to the clipboard.
+   * @param {object} options
+   * @param {object} options.tabsApi - The browser tabs API.
+   * @param {object} [options.document] - The DOM document (for execCommand fallback).
+   * @param {object} [options.clipboard] - The Clipboard API (navigator.clipboard).
+   * @returns {Promise<string>} The URL that was copied.
+   * @throws {Error} If no URL is found or clipboard write fails.
+   */
   async function copyActiveTabUrl({ tabsApi, document, clipboard }) {
     const url = await getActiveTabUrl(tabsApi);
     await copyTextToClipboard(url, { document, clipboard });
