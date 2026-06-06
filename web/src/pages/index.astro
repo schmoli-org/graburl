@@ -655,6 +655,18 @@ import Layout from '../layouts/Layout.astro';
       width: 100%;
     }
 
+    .clipboard-mock {
+      width: 100%;
+    }
+
+    .clipboard-mock span:not(.copied-badge) {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .demo-inner {
       flex-direction: column;
       align-items: stretch;
