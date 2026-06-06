@@ -25,3 +25,5 @@ docs/superpowers/plans/
 
 # Fastlane
 fastlane/report.xml
+
+.worktrees/
