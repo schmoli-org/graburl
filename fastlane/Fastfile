@@ -14,7 +14,14 @@ platform :mac do
   desc "Build Release .pkg, upload to TestFlight, and distribute to the 'auto' internal group"
   lane :release do
     certs
-    increment_build_number(xcodeproj: "GrabURL/GrabURL.xcodeproj")
+    latest_build = latest_testflight_build_number(
+      app_identifier: "com.schmoli.graburl",
+      platform: "osx"
+    )
+    increment_build_number(
+      build_number: latest_build + 1,
+      xcodeproj: "GrabURL/GrabURL.xcodeproj"
+    )
     # Several "Apple Distribution" identities share a name in the local keychain;
     # pin the export to the exact certificate embedded in the match profile.
     profile_path = ENV.fetch("sigh_com.schmoli.graburl_appstore_macos_profile-path")
