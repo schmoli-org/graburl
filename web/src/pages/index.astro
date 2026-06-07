@@ -650,31 +650,8 @@ import Layout from '../layouts/Layout.astro';
       border-radius: 25px;
     }
 
-    .toolbar-mock {
-      min-width: unset;
-      width: 100%;
-    }
-
-    .clipboard-mock {
-      width: 100%;
-    }
-
-    .clipboard-mock span:not(.copied-badge) {
-      flex: 1;
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .demo-inner {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .demo-arrow {
-      transform: rotate(90deg);
-      align-self: center;
+    .demo-strip {
+      display: none;
     }
   }
 </style>
