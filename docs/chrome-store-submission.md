@@ -30,6 +30,15 @@ GrabURL collects no user data, makes no network requests, and transmits nothing.
 
 The package suggests `Alt+Shift+C` (`Option+Shift+C` on Mac). Safari's `Cmd+Shift+C` cannot be the Chrome default — Chrome reserves `Cmd/Ctrl+Shift+C` for DevTools inspect-element and silently leaves conflicting suggestions unassigned. Users who want Safari parity can rebind manually at `chrome://extensions/shortcuts` (manual assignments override the conflict check). Worth mentioning in the listing description.
 
+## Planned: automated upload (fastlane-style)
+
+After the first manual submission mints an extension ID, add `chrome-webstore-upload-cli` so releases become `pnpm build:chrome && pnpm publish:chrome` (upload + submit for review via the [Chrome Web Store API](https://developer.chrome.com/docs/webstore/using-api)).
+
+- Credentials in `.env` (same pattern as `DEVELOPMENT_TEAM`): `EXTENSION_ID`, `CLIENT_ID`, `CLIENT_SECRET`, `REFRESH_TOKEN`
+- One-time OAuth setup: Google Cloud project → enable Chrome Web Store API → Desktop OAuth client → one-time consent flow for a refresh token
+- Constraints (mirrors the fastlane/ASC gaps): the API cannot create the first listing or edit listing/privacy/distribution forms — those stay in the dashboard; API "publish" = submit for review, no bypass
+- Record the extension ID here once it exists: `EXTENSION_ID: <pending first submission>`
+
 ## Submission steps
 
 1. `pnpm test` — suite green, including `tests/chrome-manifest.test.mjs`
