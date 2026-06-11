@@ -70,4 +70,20 @@ platform :mac do
       changelog: ENV.fetch("CHANGELOG", "Bug fixes and improvements")
     )
   end
+
+  desc "Submit the current version to App Store review"
+  lane :submit do
+    deliver(
+      platform: "osx",
+      metadata_path: "fastlane/metadata",
+      screenshots_path: "fastlane/screenshots",
+      skip_screenshots: Dir[File.join(__dir__, "screenshots/**/*.png")].empty?,
+      # Assumes a build was already uploaded via `fastlane mac release`;
+      # this lane only pushes metadata/screenshots and triggers review.
+      skip_binary_upload: true,
+      submit_for_review: true,
+      automatic_release: false,
+      force: true
+    )
+  end
 end

@@ -1,0 +1,1 @@
+url,copy,clipboard,safari,extension,link,tab,grab

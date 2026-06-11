@@ -1,0 +1,9 @@
+GrabURL puts the current tab's URL on your clipboard the moment you click the toolbar icon. One click, done. No dialogs, no confirmation steps — just the URL ready to paste wherever you need it.
+
+Prefer the keyboard? Press Command+Shift+C from any Safari window and the URL is copied instantly. The shortcut works whether the popup is open or not, so you never have to move your hands from the keyboard.
+
+Your browsing stays entirely on your device. GrabURL reads only the active tab's URL at the moment you trigger the copy action. It makes no network requests, stores nothing, and transmits nothing. The URL never leaves your Mac.
+
+Setup takes less than a minute. Install GrabURL, open Safari Settings, go to the Extensions tab, and enable GrabURL. That's all there is to it. There are no accounts to create, no preferences to configure, and no onboarding screens to dismiss.
+
+GrabURL has exactly one job and does only that job.

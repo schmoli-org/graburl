@@ -5,6 +5,10 @@ import { test } from "node:test";
 
 const manifest = JSON.parse(fs.readFileSync("web-extension/manifest.json", "utf8"));
 
+test("manifest version is 1.0", () => {
+  assert.equal(manifest.version, "1.0");
+});
+
 test("copy action defaults to Command+Shift+C on macOS", () => {
   assert.equal(
     manifest.commands._execute_action.suggested_key.mac,
