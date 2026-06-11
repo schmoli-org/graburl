@@ -119,9 +119,12 @@ platform :mac do
       metadata_path: "fastlane/metadata",
       screenshots_path: "fastlane/screenshots",
       skip_screenshots: Dir[File.join(__dir__, "screenshots/**/*.png")].empty?,
-      primary_category: "Utilities",
-      secondary_category: "Productivity",
-      app_rating_config_path: "fastlane/metadata/app_store_rating_config.json",
+      primary_category: "UTILITIES",
+      secondary_category: "PRODUCTIVITY",
+      # Age rating is NOT set here: fastlane 2.236.1 cannot satisfy Apple's
+      # new age-rating questionnaire (the API rejects the PATCH for missing
+      # required fields like ageAssurance/lootBox/userGeneratedContent).
+      # Set the age rating once in the App Store Connect web UI instead.
       # Assumes a build was already uploaded via `fastlane mac release`;
       # this lane only pushes metadata/screenshots and triggers review.
       skip_binary_upload: true,
