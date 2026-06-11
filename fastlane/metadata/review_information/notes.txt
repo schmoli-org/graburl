@@ -1,0 +1,1 @@
+GrabURL adds a button to Safari's toolbar. To test: open Safari > Settings > Extensions and enable "GrabURL". Navigate to any page, then click the GrabURL toolbar icon (or press Command+Shift+C). The active tab's URL is copied to the clipboard and the popup confirms "Copied URL". No account, login, or network access is required.

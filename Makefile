@@ -1,7 +1,7 @@
 SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help build open test clean certs release promote web web-deploy web-publish
+.PHONY: help build open test clean certs release promote submit web web-deploy web-publish
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} \
@@ -35,6 +35,9 @@ release: ## Build, upload to TestFlight, distribute to internal 'auto' group
 
 promote: ## Promote latest TestFlight build to external 'beta' (CHANGELOG="<what to test>")
 	bundle exec fastlane promote
+
+submit: ## Submit the current version to App Store review
+	bundle exec fastlane submit
 
 ##@ Web
 
