@@ -1,5 +1,25 @@
 default_platform(:mac)
 
+# ASC's buildUploads endpoint intermittently 404s an app that App.find just
+# returned when the two calls run back-to-back (fastlane#29908, regression in
+# fastlane 2.232.0); a few seconds of delay before retrying reliably recovers.
+require "spaceship"
+module Spaceship::ConnectAPI::TestFlight::API
+  alias_method :get_build_uploads_without_retry, :get_build_uploads
+  def get_build_uploads(**kwargs)
+    tries = 0
+    begin
+      get_build_uploads_without_retry(**kwargs)
+    rescue Spaceship::UnexpectedResponse => e
+      tries += 1
+      raise unless tries <= 3 && e.message.include?("does not exist")
+      FastlaneCore::UI.important("Transient ASC 'resource does not exist' error; retrying in 3s (#{tries}/3)")
+      sleep(3)
+      retry
+    end
+  end
+end
+
 platform :mac do
   desc "Sync App Store signing certificates via match"
   lane :certs do
@@ -13,11 +33,32 @@ platform :mac do
 
   desc "Build Release .pkg, upload to TestFlight, and distribute to the 'auto' internal group"
   lane :release do
+    # Fetch the build number BEFORE match: match's portal login poisons the
+    # shared ASC web session for the buildUploads endpoint for several minutes
+    # (verified 2026-06-11: identical call succeeds before `certs`, fails
+    # immediately after).
+    latest_build = begin
+      latest_testflight_build_number(
+        app_identifier: "com.schmoli.graburl",
+        platform: "osx"
+      )
+    rescue Spaceship::UnexpectedResponse => e
+      raise unless e.message.include?("does not exist")
+      # buildUploads outage can last minutes; the legacy builds endpoint
+      # (what this action used before fastlane 2.232.0) is unaffected.
+      UI.important("buildUploads endpoint is misbehaving (fastlane#29908); falling back to the legacy builds endpoint")
+      app = Spaceship::ConnectAPI::App.find("com.schmoli.graburl")
+      build = Spaceship::ConnectAPI.get_builds(
+        filter: { app: app.id, "preReleaseVersion.platform" => "MAC_OS" },
+        sort: "-uploadedDate",
+        includes: "preReleaseVersion",
+        limit: 1
+      ).first
+      UI.user_error!("No TestFlight builds found via the builds endpoint either") unless build
+      UI.important("Latest TestFlight build via fallback: #{build.version}")
+      build.version.to_i
+    end
     certs
-    latest_build = latest_testflight_build_number(
-      app_identifier: "com.schmoli.graburl",
-      platform: "osx"
-    )
     increment_build_number(
       build_number: latest_build + 1,
       xcodeproj: "GrabURL/GrabURL.xcodeproj"
