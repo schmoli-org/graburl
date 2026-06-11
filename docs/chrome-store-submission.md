@@ -5,7 +5,7 @@ The store package is produced by `pnpm build:chrome` → `dist/graburl-chrome-v<
 ## Assets
 
 - [x] 128×128 listing icon — reuse `web-extension/icons/icon-128.png` (uploaded separately in the dashboard)
-- [ ] At least one screenshot, **1280×800** or 640×400 — none exists yet. Suggested: the popup showing "Copied URL" over a recognizable page.
+- [x] Screenshot, 1280×800, 24-bit RGB — `docs/store-assets/chrome-screenshot-1280x800.png` (popup showing "Copied URL" over the landing page)
 
 ## Privacy disclosure (dashboard form)
 
@@ -24,7 +24,7 @@ GrabURL collects no user data, makes no network requests, and transmits nothing.
 | Name | GrabURL |
 | Short description | Copy the active tab URL to the clipboard. |
 | Category | Productivity |
-| Homepage URL | (optional — landing page or repo, set when a public URL exists) |
+| Homepage URL | https://graburl.schmoli.com |
 
 ## Keyboard shortcut note
 
@@ -36,7 +36,7 @@ The package suggests `Alt+Shift+C` (`Option+Shift+C` on Mac). Safari's `Cmd+Shif
 2. `pnpm build:chrome`
 3. `unzip -l dist/graburl-chrome-v*.zip` — confirm `manifest.json` is at the zip **root**
 4. Manual smoke test: `chrome://extensions` → enable Developer mode → Load unpacked → select `dist/chrome/` → click the toolbar icon on any page → "Copied URL" appears and the URL is on the clipboard; confirm the shortcut at `chrome://extensions/shortcuts`
-5. Create the screenshot (see Assets)
+5. Screenshot: `docs/store-assets/chrome-screenshot-1280x800.png`
 6. [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole) — register a developer account if needed ($5 one-time)
 7. New item → upload the zip → fill listing, privacy, and distribution tabs
 8. Submit for review (typically a few days for a first listing)
