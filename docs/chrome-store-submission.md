@@ -37,7 +37,8 @@ After the first manual submission mints an extension ID, add `chrome-webstore-up
 - Credentials in `.env` (same pattern as `DEVELOPMENT_TEAM`): `EXTENSION_ID`, `CLIENT_ID`, `CLIENT_SECRET`, `REFRESH_TOKEN`
 - One-time OAuth setup: Google Cloud project → enable Chrome Web Store API → Desktop OAuth client → one-time consent flow for a refresh token
 - Constraints (mirrors the fastlane/ASC gaps): the API cannot create the first listing or edit listing/privacy/distribution forms — those stay in the dashboard; API "publish" = submit for review, no bypass
-- Record the extension ID here once it exists: `EXTENSION_ID: <pending first submission>`
+- Extension ID (from the first manual submission, 2026-06-11): `mhnhmpcmbgdohenoknpfionidnilgijc`
+  - Store listing URL once live: https://chromewebstore.google.com/detail/mhnhmpcmbgdohenoknpfionidnilgijc
 
 ## Submission steps
 
