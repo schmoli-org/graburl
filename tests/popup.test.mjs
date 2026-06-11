@@ -88,6 +88,15 @@ test('friendlyError maps a message containing "NotAllowedError" → "Clipboard a
   );
 });
 
+test('friendlyError maps an error whose name is "NotAllowedError" → "Clipboard access denied"', () => {
+  const { GrabURLPopup } = loadPopupSandbox();
+  // Safari rejects clipboard writes with a DOMException whose .name is
+  // "NotAllowedError" but whose .message is prose that never contains it.
+  const error = new Error("The request is not allowed by the user agent.");
+  error.name = "NotAllowedError";
+  assert.equal(GrabURLPopup.friendlyError(error), "Clipboard access denied");
+});
+
 test('friendlyError returns "Copy failed" for an unknown Error', () => {
   const { GrabURLPopup } = loadPopupSandbox();
   assert.equal(

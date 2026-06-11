@@ -9,7 +9,7 @@
     const message = error.message;
     if (message === "No active tab URL") return "No page URL to copy";
     if (message === "Clipboard API unavailable") return "Clipboard not accessible";
-    if (message.includes("NotAllowedError") || message.toLowerCase().includes("permission")) {
+    if (error.name === "NotAllowedError" || message.includes("NotAllowedError") || message.toLowerCase().includes("permission")) {
       return "Clipboard access denied";
     }
     return "Copy failed";
