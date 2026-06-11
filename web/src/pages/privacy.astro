@@ -1,0 +1,249 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Privacy Policy — GrabURL"
+  description="GrabURL collects no data. Read the full privacy policy."
+>
+  <!-- ── Nav ── -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="nb" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#4AB5FF"/>
+              <stop offset="100%" stop-color="#0055C9"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#nb)"/>
+          <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </g>
+        </svg>
+        <span>GrabURL</span>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <article class="policy">
+      <h1>Privacy Policy</h1>
+      <p class="updated">Last updated: June 2026</p>
+
+      <section>
+        <h2>Overview</h2>
+        <p>GrabURL is a Safari extension that copies the active browser tab's URL to your clipboard when you click the toolbar icon or press the keyboard shortcut. That is the entirety of what it does.</p>
+      </section>
+
+      <section>
+        <h2>Data collected</h2>
+        <p><strong>None.</strong> GrabURL does not collect, store, transmit, or log any data of any kind. There is no analytics, no telemetry, no crash reporting, and no usage tracking.</p>
+      </section>
+
+      <section>
+        <h2>Network access</h2>
+        <p>GrabURL makes no network requests whatsoever. There is no server component, no backend, and no external service involved. The URL you copy never leaves your device.</p>
+      </section>
+
+      <section>
+        <h2>Permissions</h2>
+        <p>GrabURL requests two browser permissions:</p>
+        <ul>
+          <li><strong>activeTab</strong> — allows the extension to read the URL of the currently active tab at the moment you invoke it. The URL is used solely to write it to your clipboard; it is not stored or transmitted.</li>
+          <li><strong>clipboardWrite</strong> — allows the extension to write text to your clipboard. This is how the URL gets copied.</li>
+        </ul>
+        <p>No other permissions are requested or used.</p>
+      </section>
+
+      <section>
+        <h2>Third parties</h2>
+        <p>GrabURL has no third-party integrations, SDKs, or dependencies that could collect data. There are no advertisements, no affiliate links, and no in-app purchases.</p>
+      </section>
+
+      <section>
+        <h2>Contact</h2>
+        <p>Questions or concerns? <a href="https://github.com/schmoli-org/graburl/issues" target="_blank" rel="noopener noreferrer">Open an issue on GitHub</a>.</p>
+      </section>
+    </article>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <a href="/" class="footer-brand">
+        <svg width="18" height="18" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="fb" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#4AB5FF"/>
+              <stop offset="100%" stop-color="#0055C9"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#fb)"/>
+          <g transform="translate(20 20) scale(3.3333)" stroke="white" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </g>
+        </svg>
+        GrabURL
+      </a>
+      <span class="footer-divider">·</span>
+      <a href="/privacy">Privacy</a>
+      <span class="footer-divider">·</span>
+      <a href="https://github.com/schmoli-org/graburl/issues" target="_blank" rel="noopener noreferrer">Support</a>
+      <span class="footer-divider">·</span>
+      <a href="https://github.com/schmoli-org/graburl" target="_blank" rel="noopener noreferrer">GitHub</a>
+      <span class="footer-copy">© 2026</span>
+    </div>
+  </footer>
+</Layout>
+
+<style>
+  /* ── Nav ── */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--nav-bg);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── Policy article ── */
+  .policy {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 56px 24px 80px;
+  }
+
+  .policy h1 {
+    font-size: clamp(36px, 6vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .updated {
+    font-size: 14px;
+    color: var(--text-2);
+    margin-bottom: 48px;
+  }
+
+  .policy section {
+    margin-bottom: 40px;
+  }
+
+  .policy h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .policy p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-2);
+    margin-bottom: 12px;
+  }
+
+  .policy p:last-child {
+    margin-bottom: 0;
+  }
+
+  .policy ul {
+    margin: 12px 0 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .policy li {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .policy strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .policy a {
+    color: var(--blue);
+    text-decoration: none;
+  }
+
+  .policy a:hover {
+    text-decoration: underline;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 24px;
+  }
+
+  .footer-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-2);
+    flex-wrap: wrap;
+  }
+
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .footer-divider {
+    color: var(--border);
+  }
+
+  .footer a {
+    color: var(--text-2);
+    text-decoration: none;
+  }
+
+  .footer a:hover {
+    color: var(--text);
+  }
+
+  .footer-copy {
+    margin-left: auto;
+  }
+</style>
