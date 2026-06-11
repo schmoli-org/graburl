@@ -1,0 +1,42 @@
+# Chrome Web Store submission checklist
+
+The store package is produced by `pnpm build:chrome` → `dist/graburl-chrome-v<version>.zip`. It is derived from `web-extension/` with a Chrome-patched manifest (generic description, `Alt+Shift+C` shortcut). Safari is unaffected.
+
+## Assets
+
+- [x] 128×128 listing icon — reuse `web-extension/icons/icon-128.png` (uploaded separately in the dashboard)
+- [ ] At least one screenshot, **1280×800** or 640×400 — none exists yet. Suggested: the popup showing "Copied URL" over a recognizable page.
+
+## Privacy disclosure (dashboard form)
+
+GrabURL collects no user data, makes no network requests, and transmits nothing. In the Privacy practices tab:
+
+- Declare that the extension does **not** collect user data.
+- Permission justifications:
+  - `activeTab` — reads the URL of the current tab only when the user clicks the toolbar icon or presses the keyboard shortcut.
+  - `clipboardWrite` — writes that URL to the local clipboard.
+- Single purpose description: copies the active tab's URL to the clipboard.
+
+## Listing fields
+
+| Field | Value |
+|---|---|
+| Name | GrabURL |
+| Short description | Copy the active tab URL to the clipboard. |
+| Category | Productivity |
+| Homepage URL | (optional — landing page or repo, set when a public URL exists) |
+
+## Keyboard shortcut note
+
+The package suggests `Alt+Shift+C` (`Option+Shift+C` on Mac). Safari's `Cmd+Shift+C` cannot be the Chrome default — Chrome reserves `Cmd/Ctrl+Shift+C` for DevTools inspect-element and silently leaves conflicting suggestions unassigned. Users who want Safari parity can rebind manually at `chrome://extensions/shortcuts` (manual assignments override the conflict check). Worth mentioning in the listing description.
+
+## Submission steps
+
+1. `pnpm test` — suite green, including `tests/chrome-manifest.test.mjs`
+2. `pnpm build:chrome`
+3. `unzip -l dist/graburl-chrome-v*.zip` — confirm `manifest.json` is at the zip **root**
+4. Manual smoke test: `chrome://extensions` → enable Developer mode → Load unpacked → select `dist/chrome/` → click the toolbar icon on any page → "Copied URL" appears and the URL is on the clipboard; confirm the shortcut at `chrome://extensions/shortcuts`
+5. Create the screenshot (see Assets)
+6. [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole) — register a developer account if needed ($5 one-time)
+7. New item → upload the zip → fill listing, privacy, and distribution tabs
+8. Submit for review (typically a few days for a first listing)
