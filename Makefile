@@ -1,7 +1,7 @@
 SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help build open test clean certs release promote submit web web-deploy web-publish
+.PHONY: help build chrome open test clean certs release promote submit web web-deploy web-publish
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} \
@@ -12,6 +12,9 @@ help: ## Show this help
 
 build: ## Build the macOS app (signed)
 	pnpm build:mac
+
+chrome: ## Build the Chrome Web Store zip → dist/graburl-chrome-v<version>.zip
+	pnpm build:chrome
 
 open: ## Open the Xcode project
 	open GrabURL/GrabURL.xcodeproj

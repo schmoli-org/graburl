@@ -23,23 +23,7 @@ Web extension (Safari + Chrome) that copies the active tab URL to the clipboard.
 
 ## Common commands
 
-```bash
-# Run tests
-pnpm test
-
-# Build and open the macOS Safari wrapper (requires DEVELOPMENT_TEAM in .env)
-cp .env.example .env   # first time only
-pnpm dev:mac
-
-# Open without rebuilding
-pnpm open:mac
-
-# Build the Chrome Web Store zip → dist/graburl-chrome-v<version>.zip
-pnpm build:chrome
-
-# Develop the landing page
-cd web && pnpm dev
-```
+A `Makefile` wraps every routine task. **When telling the user to run something, give the `make` target, not the underlying `pnpm`/script command** (e.g. `make web`, not `cd web && pnpm dev`). Run `make help` to discover available targets; treat the `Makefile` as the source of truth.
 
 ## Key files
 
