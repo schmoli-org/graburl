@@ -7,6 +7,7 @@ function loadPopupSandbox() {
   const sandbox = {
     console,
     setTimeout,
+    clearTimeout,
     Error
   };
 
@@ -61,6 +62,50 @@ function makeDocumentWithExecCommand() {
   };
   return { doc, execCommands };
 }
+
+// ── waitForDocumentFocus tests ──────────────────────────────────────────────
+
+test("waitForDocumentFocus resolves immediately when the document already has focus", async () => {
+  const { GrabURLPopup } = loadPopupSandbox();
+  const focusListeners = [];
+
+  await GrabURLPopup.waitForDocumentFocus({
+    document: { hasFocus: () => true },
+    window: {
+      addEventListener: (event, listener) => focusListeners.push([event, listener])
+    }
+  });
+
+  assert.deepEqual(focusListeners, []);
+});
+
+test("waitForDocumentFocus resolves when the window gains focus", async () => {
+  const { GrabURLPopup } = loadPopupSandbox();
+  const focusListeners = [];
+
+  const pending = GrabURLPopup.waitForDocumentFocus({
+    document: { hasFocus: () => false },
+    window: {
+      addEventListener: (event, listener) => {
+        if (event === "focus") focusListeners.push(listener);
+      }
+    }
+  });
+
+  assert.equal(focusListeners.length, 1);
+  focusListeners[0]();
+  await pending;
+});
+
+test("waitForDocumentFocus gives up after timeoutMs when focus never arrives", async () => {
+  const { GrabURLPopup } = loadPopupSandbox();
+
+  await GrabURLPopup.waitForDocumentFocus({
+    document: { hasFocus: () => false },
+    window: { addEventListener: () => {} },
+    timeoutMs: 10
+  });
+});
 
 // ── friendlyError tests ─────────────────────────────────────────────────────
 
@@ -150,6 +195,50 @@ test("no-URL path: empty tab URL → friendly error message, state error", async
 
   assert.equal(statusElement.textContent, "No page URL to copy");
   assert.equal(statusElement.dataset.state, "error");
+});
+
+// ── focus-wait path (Windows Chrome bug fix) ─────────────────────────────────
+
+test("copy is deferred until the popup document gains focus", async () => {
+  const { GrabURLPopup, CopyUrlExtension } = loadPopupSandbox();
+  const statusElement = makeStatusElement();
+  const writes = [];
+  const focusListeners = [];
+  let focused = false;
+
+  const pending = GrabURLPopup.copyCurrentTabUrl({
+    CopyUrlExtension,
+    tabsApi: makeTabsApi("https://example.com/"),
+    clipboard: {
+      writeText: async (text) => {
+        if (!focused) {
+          const error = new Error(
+            "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+          );
+          error.name = "NotAllowedError";
+          throw error;
+        }
+        writes.push(text);
+      }
+    },
+    document: { hasFocus: () => focused },
+    window: {
+      addEventListener: (event, listener) => {
+        if (event === "focus") focusListeners.push(listener);
+      }
+    },
+    statusElement,
+    close: () => {}
+  });
+
+  assert.equal(focusListeners.length, 1);
+  focused = true;
+  focusListeners[0]();
+  await pending;
+
+  assert.deepEqual(writes, ["https://example.com/"]);
+  assert.equal(statusElement.textContent, "Copied URL");
+  assert.equal(statusElement.dataset.state, "success");
 });
 
 // ── execCommand fallback path (the bug fix) ──────────────────────────────────

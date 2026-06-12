@@ -24,12 +24,22 @@
    * @param {object} [options.document] - The DOM document (required for execCommand fallback).
    * @param {object} [options.clipboard] - The Clipboard API object (navigator.clipboard).
    * @returns {Promise<void>}
-   * @throws {Error} If clipboard.writeText() rejects, execCommand('copy') returns false, or no clipboard method is available.
+   * @throws {Error} If every available copy method fails: the original writeText error
+   *   when clipboard.writeText() rejected, otherwise "Clipboard API unavailable".
    */
   async function copyTextToClipboard(text, { document, clipboard } = {}) {
+    // Chrome rejects writeText with NotAllowedError ("Document is not focused")
+    // when the popup hasn't received focus yet; execCommand has no focus check,
+    // so a writeText rejection falls through to the DOM fallback below.
+    let writeTextError = null;
+
     if (clipboard?.writeText) {
-      await clipboard.writeText(text);
-      return;
+      try {
+        await clipboard.writeText(text);
+        return;
+      } catch (error) {
+        writeTextError = error;
+      }
     }
 
     const canUseDomClipboard =
@@ -68,7 +78,7 @@
       }
     }
 
-    throw new Error("Clipboard API unavailable");
+    throw writeTextError ?? new Error("Clipboard API unavailable");
   }
 
   /**

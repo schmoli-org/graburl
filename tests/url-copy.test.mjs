@@ -102,6 +102,72 @@ test("copyTextToClipboard falls back to DOM copy when clipboard API is unavailab
   assert.deepEqual(removed, ["https://fallback.example/"]);
 });
 
+test("copyTextToClipboard falls back to DOM copy when writeText rejects", async () => {
+  const { copyTextToClipboard } = loadExtensionModule();
+  const sandbox = loadExtensionSandbox();
+  const { execCommands } = installClipboardDom(sandbox);
+
+  const notFocused = new Error(
+    "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+  );
+  notFocused.name = "NotAllowedError";
+
+  await copyTextToClipboard("https://unfocused.example/", {
+    clipboard: {
+      writeText: async () => {
+        throw notFocused;
+      }
+    },
+    document: sandbox.document
+  });
+
+  assert.deepEqual(execCommands, ["copy"]);
+});
+
+test("copyTextToClipboard rethrows the writeText error when no DOM fallback exists", async () => {
+  const { copyTextToClipboard } = loadExtensionModule();
+
+  const notFocused = new Error(
+    "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+  );
+  notFocused.name = "NotAllowedError";
+
+  await assert.rejects(
+    copyTextToClipboard("https://unfocused.example/", {
+      clipboard: {
+        writeText: async () => {
+          throw notFocused;
+        }
+      }
+    }),
+    (error) => error === notFocused
+  );
+});
+
+test("copyTextToClipboard rethrows the writeText error when execCommand also fails", async () => {
+  const { copyTextToClipboard } = loadExtensionModule();
+  const sandbox = loadExtensionSandbox();
+  installClipboardDom(sandbox);
+  sandbox.document.execCommand = () => false;
+
+  const notFocused = new Error(
+    "Failed to execute 'writeText' on 'Clipboard': Document is not focused."
+  );
+  notFocused.name = "NotAllowedError";
+
+  await assert.rejects(
+    copyTextToClipboard("https://unfocused.example/", {
+      clipboard: {
+        writeText: async () => {
+          throw notFocused;
+        }
+      },
+      document: sandbox.document
+    }),
+    (error) => error === notFocused
+  );
+});
+
 test("copyActiveTabUrl copies the active tab URL exactly", async () => {
   const { copyActiveTabUrl } = loadExtensionModule();
   const writes = [];
