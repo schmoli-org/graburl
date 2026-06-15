@@ -1,42 +1,12 @@
-import { readFileSync, existsSync } from "node:fs";
-import { resolve, dirname, join } from "node:path";
+import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
+import { loadEnv } from "./env.mjs";
+
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const envFile = join(rootDir, ".env");
 
-function parseEnvFile(contents) {
-  const env = {};
-
-  for (const rawLine of contents.split(/\r?\n/)) {
-    const line = rawLine.trim();
-    if (!line || line.startsWith("#")) {
-      continue;
-    }
-
-    const equalsIndex = line.indexOf("=");
-    if (equalsIndex === -1) {
-      continue;
-    }
-
-    const key = line.slice(0, equalsIndex).trim();
-    let value = line.slice(equalsIndex + 1).trim();
-
-    if (
-      (value.startsWith('"') && value.endsWith('"')) ||
-      (value.startsWith("'") && value.endsWith("'"))
-    ) {
-      value = value.slice(1, -1);
-    }
-
-    env[key] = value;
-  }
-
-  return env;
-}
-
-const fileEnv = existsSync(envFile) ? parseEnvFile(readFileSync(envFile, "utf8")) : {};
+const fileEnv = loadEnv(rootDir);
 const developmentTeam = process.env.DEVELOPMENT_TEAM ?? fileEnv.DEVELOPMENT_TEAM;
 
 if (!developmentTeam) {

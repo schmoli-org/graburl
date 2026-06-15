@@ -34,5 +34,6 @@ A `Makefile` wraps every routine task. **When telling the user to run something,
 | `web-extension/popup.css` | Popup styles |
 | `web-extension/manifest.json` | MV3 manifest, permissions, keyboard shortcut |
 | `scripts/build-chrome.mjs` | Chrome Web Store build — copies `web-extension/`, patches manifest, zips to `dist/` |
+| `scripts/publish-chrome.mjs` | Chrome Web Store upload + submit-for-review via the CWS API (`make chrome-submit`) |
 | `web/src/layouts/Layout.astro` | Global CSS variables and font for the landing page |
 | `web/src/pages/index.astro` | Landing page content and component styles |

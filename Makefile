@@ -1,7 +1,7 @@
 SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help build chrome open test clean certs release promote submit web web-deploy web-publish
+.PHONY: help build chrome open test clean certs release promote submit chrome-submit web web-deploy web-publish
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} \
@@ -41,6 +41,9 @@ promote: ## Promote latest TestFlight build to external 'beta' (CHANGELOG="<what
 
 submit: ## Submit the current version to App Store review
 	bundle exec fastlane submit
+
+chrome-submit: chrome ## Build, upload, and submit the Chrome extension for review
+	pnpm publish:chrome
 
 ##@ Web
 
