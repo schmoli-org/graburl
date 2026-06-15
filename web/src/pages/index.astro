@@ -165,6 +165,50 @@ import Layout from '../layouts/Layout.astro';
         </div>
       </div>
     </section>
+
+    <!-- ── How to use ── -->
+    <section class="how-to">
+      <div class="how-to-inner">
+        <h2 class="how-to-heading">How to use</h2>
+        <div class="how-to-grid">
+          <div class="how-to-card">
+            <div class="feature-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0077ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m4 4 7.07 17 2.51-7.39L21 11.07z"/>
+              </svg>
+            </div>
+            <h3>Click the toolbar icon</h3>
+            <p>Pin GrabURL to your browser toolbar, then click the icon on any tab. The URL copies instantly and the popup closes on its own.</p>
+          </div>
+          <div class="how-to-card">
+            <div class="feature-icon-wrap">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0077ED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                <path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/>
+                <path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/>
+                <path d="M7 16h10"/>
+              </svg>
+            </div>
+            <h3>Keyboard shortcut</h3>
+            <p>Copy the URL without touching the mouse. Shortcuts vary by browser:</p>
+            <div class="shortcut-list">
+              <div class="shortcut-row">
+                <span class="shortcut-label">Safari · macOS</span>
+                <span class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>C</kbd></span>
+              </div>
+              <div class="shortcut-row">
+                <span class="shortcut-label">Chrome · macOS</span>
+                <span class="shortcut-keys"><kbd>⌥</kbd><kbd>⇧</kbd><kbd>C</kbd></span>
+              </div>
+              <div class="shortcut-row">
+                <span class="shortcut-label">Chrome · Windows</span>
+                <span class="shortcut-keys"><kbd>Alt</kbd><kbd>Shift</kbd><kbd>C</kbd></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- ── Footer ── -->
@@ -594,6 +638,87 @@ import Layout from '../layouts/Layout.astro';
     color: var(--text-2);
   }
 
+  /* ── How to use ── */
+  .how-to {
+    padding: 80px 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  .how-to-inner {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .how-to-heading {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--text);
+  }
+
+  .how-to-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+
+  .how-to-card {
+    background: var(--bg-alt);
+    border-radius: 20px;
+    padding: 32px;
+  }
+
+  .how-to-card h3 {
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+
+  .how-to-card > p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-2);
+    margin-bottom: 20px;
+  }
+
+  .shortcut-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .shortcut-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .shortcut-label {
+    font-size: 13px;
+    color: var(--text-2);
+  }
+
+  .shortcut-keys {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  kbd {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 12px;
+    font-family: inherit;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 1px 0 var(--border);
+    color: var(--text);
+  }
 
   /* ── Footer ── */
   .footer {
