@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "GrabURL API Probe",
+  "description": "Throwaway probe to verify no-window clipboard + feedback APIs in Safari and Chrome. NOT for distribution.",
+  "version": "0.0.1",
+  "permissions": ["activeTab", "clipboardWrite", "offscreen"],
+  "icons": {
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Click me: run the no-window copy test",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "options_ui": {
+    "page": "probe.html",
+    "open_in_tab": true
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "probe-copy": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Probe: copy a sentinel string from the background (no window)"
+    }
+  }
+}
