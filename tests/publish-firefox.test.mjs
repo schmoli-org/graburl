@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import {
+  isStaleBuild,
   missingCredentials,
   signArgs,
   zipPathFor
@@ -27,6 +28,11 @@ test("zipPathFor matches the build-firefox output path", () => {
     zipPathFor("/repo", "1.0.1"),
     "/repo/dist/graburl-firefox-v1.0.1.zip"
   );
+});
+
+test("isStaleBuild flags a built version that differs from the source", () => {
+  assert.equal(isStaleBuild("1.0.2", "1.0.1"), true);
+  assert.equal(isStaleBuild("1.0.1", "1.0.1"), false);
 });
 
 test("signArgs submits the built source dir to the listed channel", () => {

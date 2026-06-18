@@ -17,6 +17,13 @@ export function zipPathFor(rootDir, version) {
   return join(rootDir, "dist", `graburl-firefox-v${version}.zip`);
 }
 
+// A direct `pnpm publish:firefox` (bypassing `make firefox`, which rebuilds)
+// could otherwise sign a stale dist/firefox while logging the bumped source
+// version. Comparing the built manifest version to the source catches that.
+export function isStaleBuild(sourceVersion, builtVersion) {
+  return sourceVersion !== builtVersion;
+}
+
 // web-ext signs and submits via the AMO API; building the argv separately keeps
 // it unit-testable without invoking the network. The credentials are passed as
 // flags rather than env so the spawn does not depend on the caller's shell.
@@ -50,8 +57,17 @@ if (fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
     readFileSync(join(rootDir, "web-extension", "manifest.json"), "utf8")
   );
   const sourceDir = join(rootDir, "dist", "firefox");
-  if (!existsSync(sourceDir)) {
+  const builtManifestPath = join(sourceDir, "manifest.json");
+  if (!existsSync(builtManifestPath)) {
     console.error(`Missing ${sourceDir} — run \`make firefox\` first.`);
+    process.exit(1);
+  }
+
+  const builtVersion = JSON.parse(readFileSync(builtManifestPath, "utf8")).version;
+  if (isStaleBuild(manifest.version, builtVersion)) {
+    console.error(
+      `${sourceDir} is stale (built v${builtVersion}, source is v${manifest.version}) — run \`make firefox\` first.`
+    );
     process.exit(1);
   }
 
