@@ -1,7 +1,7 @@
 SCRIPTS := scripts
 
 .DEFAULT_GOAL := help
-.PHONY: help build chrome open test clean certs release promote submit chrome-submit web web-deploy web-publish
+.PHONY: help build chrome firefox open test clean certs release promote submit chrome-submit firefox-submit web web-deploy web-publish
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*?## "} \
@@ -15,6 +15,9 @@ build: ## Build the macOS app (signed)
 
 chrome: ## Build the Chrome Web Store zip → dist/graburl-chrome-v<version>.zip
 	pnpm build:chrome
+
+firefox: ## Build the Firefox Add-ons zip → dist/graburl-firefox-v<version>.zip
+	pnpm build:firefox
 
 open: ## Open the Xcode project
 	open GrabURL/GrabURL.xcodeproj
@@ -44,6 +47,9 @@ submit: ## Submit the current version to App Store review
 
 chrome-submit: chrome ## Build, upload, and submit the Chrome extension for review
 	pnpm publish:chrome
+
+firefox-submit: firefox ## Build, sign, and submit the Firefox add-on to AMO
+	pnpm publish:firefox
 
 ##@ Web
 
