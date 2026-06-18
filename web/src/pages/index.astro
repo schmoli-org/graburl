@@ -74,7 +74,7 @@ import Layout from '../layouts/Layout.astro';
       <h1>GrabURL</h1>
       <p class="tagline">Copy any URL instantly.</p>
       <p class="description">
-        A browser extension for Safari and Chrome that puts the current page's URL on your clipboard with a single click. Nothing more, nothing less.
+        A browser extension for Safari, Chrome, and Firefox that puts the current page's URL on your clipboard with a single click. Nothing more, nothing less.
       </p>
       <div class="hero-actions">
         <a href="https://chromewebstore.google.com/detail/mhnhmpcmbgdohenoknpfionidnilgijc" target="_blank" rel="noopener noreferrer" class="btn btn-lg">
@@ -83,8 +83,11 @@ import Layout from '../layouts/Layout.astro';
         <a href="https://apps.apple.com/app/id6776873029" target="_blank" rel="noopener noreferrer" class="btn btn-lg">
           Add to Safari
         </a>
+        <a href="https://addons.mozilla.org/firefox/addon/graburl/" target="_blank" rel="noopener noreferrer" class="btn btn-lg">
+          Add to Firefox
+        </a>
       </div>
-      <p class="availability">Chrome · Safari (macOS)</p>
+      <p class="availability">Chrome · Safari (macOS) · Firefox</p>
     </section>
 
     <!-- ── Demo strip ── -->
@@ -161,7 +164,7 @@ import Layout from '../layouts/Layout.astro';
             </svg>
           </div>
           <h3>Keyboard shortcut</h3>
-          <p>Grab the URL without touching the mouse. Cmd+Shift+C on Safari, Alt+Shift+C on Chrome.</p>
+          <p>Grab the URL without touching the mouse. Cmd+Shift+C on Safari, Alt+Shift+C on Chrome and Firefox.</p>
         </div>
       </div>
     </section>
@@ -202,6 +205,14 @@ import Layout from '../layouts/Layout.astro';
               </div>
               <div class="shortcut-row">
                 <span class="shortcut-label">Chrome · Windows</span>
+                <span class="shortcut-keys"><kbd>Alt</kbd><kbd>Shift</kbd><kbd>C</kbd></span>
+              </div>
+              <div class="shortcut-row">
+                <span class="shortcut-label">Firefox · macOS</span>
+                <span class="shortcut-keys"><kbd>⌥</kbd><kbd>⇧</kbd><kbd>C</kbd></span>
+              </div>
+              <div class="shortcut-row">
+                <span class="shortcut-label">Firefox · Windows</span>
                 <span class="shortcut-keys"><kbd>Alt</kbd><kbd>Shift</kbd><kbd>C</kbd></span>
               </div>
             </div>
