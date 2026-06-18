@@ -22,7 +22,6 @@ DerivedData/
 .superpowers/
 .claude/worktrees/
 .claude/plans/
-docs/superpowers/plans/
 
 # Fastlane
 fastlane/report.xml

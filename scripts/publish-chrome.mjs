@@ -98,7 +98,7 @@ if (fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   const missing = missingCredentials(env);
   if (missing.length > 0) {
     console.error(`Missing in .env or the environment: ${missing.join(", ")}`);
-    console.error("See docs/chrome-store-submission.md for the one-time OAuth setup.");
+    console.error("See docs/private/chrome-store-submission.md for the one-time OAuth setup.");
     process.exit(1);
   }
 
